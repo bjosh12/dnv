@@ -1,0 +1,1 @@
+import{M as e}from"./sanity-BBxpzlgg.js";export{e as default};

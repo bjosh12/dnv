@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     // Send notification to business
     await resend.emails.send({
-      from: `${SITE_NAME} <noreply@digitalnomadrespain.com>`,
+      from: `${SITE_NAME} <noreply@digitalnomadinspain.com>`,
       to: CONTACT_EMAIL,
       subject: `New enquiry from ${name} — ${visa}`,
       html: `
@@ -33,13 +33,13 @@ export async function POST(req: Request) {
 
     // Send auto-reply to user
     await resend.emails.send({
-      from: `${SITE_NAME} <noreply@digitalnomadrespain.com>`,
+      from: `${SITE_NAME} <noreply@digitalnomadinspain.com>`,
       to: email,
       subject: `We received your message — ${SITE_NAME}`,
       html: `
         <h2>Thanks for reaching out, ${name}!</h2>
         <p>We've received your message and will get back to you within 24 hours (on weekdays).</p>
-        <p>In the meantime, you might find answers in our <a href="https://digitalnomadrespain.com/faq">FAQ</a>.</p>
+        <p>In the meantime, you might find answers in our <a href="https://www.digitalnomadinspain.com/faq">FAQ</a>.</p>
         <p>
           Want to speak with us sooner?
           <a href="https://book.lakbyte.com/widget/booking/MRAtDGOOso1sUiM2MKix?am_id=joshua9606">

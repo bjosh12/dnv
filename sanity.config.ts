@@ -113,7 +113,7 @@ export default defineConfig({
       },
       previewUrl: {
         origin: process.env.NODE_ENV === 'production'
-          ? 'https://digitalnomadrespain.com'
+          ? 'https://www.digitalnomadinspain.com'
           : 'http://localhost:3000',
         previewMode: {
           enable: '/api/draft-mode/enable',

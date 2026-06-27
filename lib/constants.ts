@@ -1,6 +1,6 @@
 export const SITE_NAME = "Digital Nomad In Spain";
 export const SITE_TAGLINE = "Your trusted guide to living and working legally in Spain";
-export const SITE_URL = "https://digitalnomadrespain.com";
+export const SITE_URL = "https://www.digitalnomadinspain.com";
 export const CONTACT_EMAIL = "hello@digitalnomadrespain.com";
 export const WHATSAPP_NUMBER = "34600000000"; // replace with real number
 // Free advice session with Joshua (replace with your personal booking link)
