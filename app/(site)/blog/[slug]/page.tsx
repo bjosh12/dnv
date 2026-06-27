@@ -85,10 +85,19 @@ export default async function BlogPostPage({
     datePublished: post.publishedAt ?? undefined,
     dateModified: post.publishedAt ?? undefined,
     url: `https://www.digitalnomadinspain.com/blog/${slug}`,
+    author: {
+      "@type": "Person",
+      name: post.author?.name ?? "Digital Nomad In Spain",
+      url: "https://www.digitalnomadinspain.com/about",
+    },
     publisher: {
       "@type": "Organization",
       name: "Digital Nomad In Spain",
       url: "https://www.digitalnomadinspain.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://www.digitalnomadinspain.com/icon.svg",
+      },
     },
     ...(post.categories?.length && { keywords: post.categories.join(", ") }),
   };

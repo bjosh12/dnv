@@ -48,6 +48,12 @@ const organizationSchema = {
   description: SITE_TAGLINE,
   areaServed: "Worldwide",
   serviceType: ["Digital Nomad Visa Consulting", "Non-Lucrative Visa Consulting", "Spain Immigration Consulting"],
+  logo: {
+    "@type": "ImageObject",
+    url: `${SITE_URL}/icon.svg`,
+    width: 512,
+    height: 512,
+  },
   sameAs: [],
 };
 
