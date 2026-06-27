@@ -1,5 +1,18 @@
 import Link from "next/link";
 import { ArrowRight, Calendar } from "lucide-react";
+import { urlFor } from "@/lib/sanity";
+
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80";
+
+function getImageSrc(mainImage: unknown): string {
+  if (!mainImage) return FALLBACK_IMAGE;
+  if (typeof mainImage === "string") return mainImage;
+  try {
+    return urlFor(mainImage).width(700).height(300).url();
+  } catch {
+    return FALLBACK_IMAGE;
+  }
+}
 
 // Placeholder posts until Sanity is connected
 const placeholderPosts = [
@@ -35,7 +48,8 @@ const placeholderPosts = [
   },
 ];
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr: string | null | undefined) {
+  if (!dateStr) return null;
   return new Date(dateStr).toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
@@ -76,7 +90,7 @@ export default function BlogPreview({ posts }: { posts?: typeof placeholderPosts
             >
               <div className="relative h-44 overflow-hidden">
                 <img
-                  src={post.mainImage}
+                  src={getImageSrc(post.mainImage)}
                   alt={post.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -87,10 +101,12 @@ export default function BlogPreview({ posts }: { posts?: typeof placeholderPosts
                 )}
               </div>
               <div className="flex flex-col flex-1 p-5">
-                <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {formatDate(post.publishedAt)}
-                </div>
+                {formatDate(post.publishedAt) && (
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {formatDate(post.publishedAt)}
+                  </div>
+                )}
                 <h3 className="font-bold text-[#0F1F3D] text-sm leading-snug mb-2 group-hover:text-[#1B3A6B] transition-colors line-clamp-2">
                   {post.title}
                 </h3>
