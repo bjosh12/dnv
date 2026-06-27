@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Calendar, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { sanityFetch } from "@/lib/live";
+import { urlFor } from "@/lib/sanity";
 
-// Re-fetch from Sanity every 60 seconds — new posts appear within 1 minute of publishing
 export const revalidate = 60;
 
 export const metadata: Metadata = {
@@ -11,72 +12,29 @@ export const metadata: Metadata = {
     "Expert guides on Spain's Digital Nomad Visa, Non-Lucrative Visa, expat life, taxes, banking, and everything you need to know before moving to Spain.",
 };
 
-// Placeholder posts — will be replaced by Sanity data
-const posts = [
-  {
-    _id: "1",
-    title: "Spain's Digital Nomad Visa: Complete 2025 Guide",
-    slug: "spain-digital-nomad-visa-guide-2025",
-    excerpt: "Everything you need to know about Spain's DNV — requirements, income thresholds, documents, and the application process explained step by step.",
-    category: "Digital Nomad Visa",
-    date: "2025-03-15",
-    readTime: "12 min read",
-    image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80",
-    featured: true,
-  },
-  {
-    _id: "2",
-    title: "Non-Lucrative Visa vs Digital Nomad Visa: Which Is Right for You?",
-    slug: "nlv-vs-dnv-comparison",
-    excerpt: "A detailed comparison of Spain's two most popular long-stay visas to help you choose the right path for your move.",
-    category: "Comparison",
-    date: "2025-02-28",
-    readTime: "8 min read",
-    image: "https://images.unsplash.com/photo-1555990793-da11153b6c8d?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    _id: "3",
-    title: "Banking in Spain as an Expat: How to Open a Bank Account",
-    slug: "banking-spain-expat-guide",
-    excerpt: "The banks that actually work for non-residents, what documents you need, and how to avoid common pitfalls.",
-    category: "Spain Life",
-    date: "2025-02-10",
-    readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1464820453369-31d2c0b651af?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    _id: "4",
-    title: "Spain's Beckham Law Explained: Tax Benefits for New Residents",
-    slug: "spain-beckham-law-explained",
-    excerpt: "The special tax regime that lets new Spanish residents pay a flat 24% rate on Spanish income. Who qualifies and how to apply.",
-    category: "Taxes & Banking",
-    date: "2025-01-20",
-    readTime: "9 min read",
-    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    _id: "5",
-    title: "How Sarah Moved from London to Barcelona in 4 Months",
-    slug: "sarah-london-barcelona-nlv-success-story",
-    excerpt: "A real client story: how a British retiree navigated the Non-Lucrative Visa and is now living her dream life in Catalonia.",
-    category: "Success Stories",
-    date: "2025-01-05",
-    readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    _id: "6",
-    title: "The TIE Card: What It Is and How to Get It",
-    slug: "tie-card-spain-guide",
-    excerpt: "After your visa approval, you'll need to apply for a TIE residency card. Here's the complete process.",
-    category: "After Approval",
-    date: "2024-12-18",
-    readTime: "7 min read",
-    image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=80",
-  },
-];
+type SanityPost = {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  publishedAt?: string;
+  mainImage?: unknown;
+  categories?: string[];
+  featured?: boolean;
+};
 
-const categories = ["All", "Digital Nomad Visa", "Non-Lucrative Visa", "Spain Life", "Taxes & Banking", "Success Stories", "After Approval"];
+const POSTS_QUERY = `*[_type == "post"] | order(publishedAt desc) {
+  _id,
+  title,
+  "slug": slug.current,
+  excerpt,
+  publishedAt,
+  mainImage,
+  "categories": categories[]->title,
+  featured
+}`;
+
+const ALL_CATEGORIES = ["All", "Digital Nomad Visa", "Non-Lucrative Visa", "Spain Life", "Taxes & Banking", "Success Stories", "After Approval", "Comparison", "After Approval"];
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-US", {
@@ -86,9 +44,25 @@ function formatDate(dateStr: string) {
   });
 }
 
-export default function BlogPage() {
-  const featured = posts.find((p) => p.featured);
-  const rest = posts.filter((p) => !p.featured);
+function getImageUrl(mainImage: unknown): string {
+  if (!mainImage) return "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80";
+  try {
+    return urlFor(mainImage).width(700).height(400).url();
+  } catch {
+    return "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80";
+  }
+}
+
+export default async function BlogPage() {
+  const { data: rawPosts } = await sanityFetch({ query: POSTS_QUERY }).catch(() => ({ data: [] }));
+  const posts = (rawPosts ?? []) as SanityPost[];
+
+  // Derive unique categories from actual posts, keeping a sensible order
+  const postCategories = Array.from(new Set(posts.flatMap((p) => p.categories ?? [])));
+  const categories = ["All", ...ALL_CATEGORIES.filter((c) => c !== "All" && postCategories.includes(c)), ...postCategories.filter((c) => !ALL_CATEGORIES.includes(c))];
+
+  const featured = posts.find((p) => p.featured) ?? posts[0] ?? null;
+  const rest = posts.filter((p) => p._id !== featured?._id);
 
   return (
     <>
@@ -130,7 +104,7 @@ export default function BlogPage() {
               <div className="grid md:grid-cols-2">
                 <div className="relative h-64 md:h-auto overflow-hidden">
                   <img
-                    src={featured.image}
+                    src={getImageUrl(featured.mainImage)}
                     alt={featured.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -139,22 +113,27 @@ export default function BlogPage() {
                   </span>
                 </div>
                 <div className="p-8 flex flex-col justify-center">
-                  <span className="text-xs font-semibold text-[#1B3A6B] uppercase tracking-wider mb-2">
-                    {featured.category}
-                  </span>
+                  {featured.categories?.[0] && (
+                    <span className="text-xs font-semibold text-[#1B3A6B] uppercase tracking-wider mb-2">
+                      {featured.categories[0]}
+                    </span>
+                  )}
                   <h2 className="text-2xl font-bold text-[#0F1F3D] mb-3 group-hover:text-[#1B3A6B] transition-colors leading-snug">
                     {featured.title}
                   </h2>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                    {featured.excerpt}
-                  </p>
-                  <div className="flex items-center gap-4 text-xs text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {formatDate(featured.date)}
-                    </span>
-                    <span>{featured.readTime}</span>
-                  </div>
+                  {featured.excerpt && (
+                    <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                      {featured.excerpt}
+                    </p>
+                  )}
+                  {featured.publishedAt && (
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" />
+                        {formatDate(featured.publishedAt)}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-1.5 mt-4 text-sm font-semibold text-[#FF6B35]">
                     Read article
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -162,6 +141,14 @@ export default function BlogPage() {
                 </div>
               </div>
             </Link>
+          )}
+
+          {/* Empty state */}
+          {posts.length === 0 && (
+            <div className="text-center py-20 text-gray-400">
+              <p className="text-lg font-medium">No posts yet</p>
+              <p className="text-sm mt-1">Blog posts will appear here once published.</p>
+            </div>
           )}
 
           {/* Post grid */}
@@ -174,28 +161,33 @@ export default function BlogPage() {
               >
                 <div className="relative h-44 overflow-hidden">
                   <img
-                    src={post.image}
+                    src={getImageUrl(post.mainImage)}
                     alt={post.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <span className="absolute top-3 left-3 bg-[#1B3A6B] text-white text-xs font-medium px-2.5 py-1 rounded-full">
-                    {post.category}
-                  </span>
+                  {post.categories?.[0] && (
+                    <span className="absolute top-3 left-3 bg-[#1B3A6B] text-white text-xs font-medium px-2.5 py-1 rounded-full">
+                      {post.categories[0]}
+                    </span>
+                  )}
                 </div>
                 <div className="p-5">
-                  <div className="flex items-center gap-3 text-xs text-gray-500 mb-2">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {formatDate(post.date)}
-                    </span>
-                    <span>{post.readTime}</span>
-                  </div>
+                  {post.publishedAt && (
+                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-2">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {formatDate(post.publishedAt)}
+                      </span>
+                    </div>
+                  )}
                   <h3 className="font-bold text-[#0F1F3D] text-sm leading-snug mb-2 group-hover:text-[#1B3A6B] transition-colors line-clamp-2">
                     {post.title}
                   </h3>
-                  <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">
-                    {post.excerpt}
-                  </p>
+                  {post.excerpt && (
+                    <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">
+                      {post.excerpt}
+                    </p>
+                  )}
                   <div className="flex items-center gap-1 mt-3 text-xs font-semibold text-[#FF6B35]">
                     Read more
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
