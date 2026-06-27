@@ -140,6 +140,21 @@ export default async function BlogPostPage({
                           <p className="leading-relaxed mb-4 text-gray-600">{children}</p>
                         ),
                       },
+                      marks: {
+                        link: ({ children, value }) => {
+                          const isInternal = value?.href?.includes("digitalnomadinspain.com");
+                          return (
+                            <a
+                              href={value?.href}
+                              target={isInternal ? "_self" : "_blank"}
+                              rel={isInternal ? undefined : "noopener noreferrer"}
+                              className="text-[#FF6B35] underline underline-offset-2 hover:text-[#E85520] transition-colors"
+                            >
+                              {children}
+                            </a>
+                          );
+                        },
+                      },
                     }}
                   />
                 </div>
