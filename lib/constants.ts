@@ -2,7 +2,7 @@ export const SITE_NAME = "Digital Nomad In Spain";
 export const SITE_TAGLINE = "Your trusted guide to living and working legally in Spain";
 export const SITE_URL = "https://www.digitalnomadinspain.com";
 export const CONTACT_EMAIL = "hello@digitalnomadrespain.com";
-export const WHATSAPP_NUMBER = "34600000000"; // replace with real number
+export const WHATSAPP_NUMBER = "34601191230";
 // Free advice session with Joshua (replace with your personal booking link)
 export const FREE_BOOKING_URL = "https://calendly.com/joshua-aguirre-dst/digital-nomad-visa-free-consultation";
 
