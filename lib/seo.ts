@@ -12,19 +12,21 @@ type PageDefaults = {
   title: string;
   description: string;
   path: string;
+  type?: "website" | "article";
 };
 
-export function buildMetadata(
-  seo: SeoData,
-  defaults: PageDefaults
-): Metadata {
+const DEFAULT_OG_IMAGE = `${SITE_URL}/opengraph-image`;
+
+export function buildMetadata(seo: SeoData, defaults: PageDefaults): Metadata {
   const title = seo?.title || defaults.title;
   const description = seo?.description || defaults.description;
-  const image = seo?.imageUrl;
+  const image = seo?.imageUrl || DEFAULT_OG_IMAGE;
   const url = `${SITE_URL}${defaults.path}`;
+  const type = defaults.type ?? "website";
 
   return {
-    title,
+    // Use absolute to bypass the root layout's title template
+    title: { absolute: title },
     description,
     robots: seo?.noIndex ? "noindex,nofollow" : "index,follow",
     openGraph: {
@@ -32,14 +34,14 @@ export function buildMetadata(
       description,
       url,
       siteName: SITE_NAME,
-      type: "website",
-      ...(image && { images: [{ url: image, width: 1200, height: 630 }] }),
+      type,
+      images: [{ url: image, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      ...(image && { images: [image] }),
+      images: [image],
     },
     alternates: { canonical: url },
   };

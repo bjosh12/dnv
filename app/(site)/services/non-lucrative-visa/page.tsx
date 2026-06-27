@@ -77,8 +77,20 @@ export default async function NonLucrativeVisaPage() {
   const pricingNote = sanity?.pricingNote ?? "Full end-to-end service. Government fees extra.";
   const pricingIncludes = sanity?.pricingIncludes?.length ? sanity.pricingIncludes : ["Personalised document checklist", "Income verification guidance", "Document translation coordination", "Application preparation & review", "Consulate appointment support"];
 
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "Spain Non-Lucrative Visa Consulting",
+    description: heroBody,
+    provider: { "@type": "Organization", name: "Digital Nomad In Spain", url: "https://www.digitalnomadinspain.com" },
+    areaServed: "Worldwide",
+    url: "https://www.digitalnomadinspain.com/services/non-lucrative-visa",
+    offers: { "@type": "Offer", price: pricingFrom.replace("€", ""), priceCurrency: "EUR", description: pricingNote },
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
       {/* Hero */}
       <section className="relative pt-32 pb-20 overflow-hidden bg-[#0F1F3D]">
         <div className="absolute inset-0 opacity-10">

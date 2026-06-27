@@ -78,8 +78,20 @@ export default async function DigitalNomadVisaPage() {
   const pricingNote = sanity?.pricingNote ?? "Full end-to-end service. Government fees extra.";
   const pricingIncludes = sanity?.pricingIncludes?.length ? sanity.pricingIncludes : ["Document checklist & guidance", "Translation coordination", "Application preparation", "Consulate submission support", "Follow-up & queries"];
 
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "Spain Digital Nomad Visa Consulting",
+    description: heroBody,
+    provider: { "@type": "Organization", name: "Digital Nomad In Spain", url: "https://www.digitalnomadinspain.com" },
+    areaServed: "Worldwide",
+    url: "https://www.digitalnomadinspain.com/services/digital-nomad-visa",
+    offers: { "@type": "Offer", price: pricingFrom.replace("€", ""), priceCurrency: "EUR", description: pricingNote },
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
       {/* Hero */}
       <section className="relative pt-32 pb-20 overflow-hidden bg-[#1B3A6B]">
         <div className="absolute inset-0 opacity-10">

@@ -7,9 +7,17 @@ import { urlFor } from "@/lib/sanity";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: { absolute: "Blog — Spain Visa Guides & Expat Advice | Digital Nomad In Spain" },
   description:
     "Expert guides on Spain's Digital Nomad Visa, Non-Lucrative Visa, expat life, taxes, banking, and everything you need to know before moving to Spain.",
+  alternates: { canonical: "https://www.digitalnomadinspain.com/blog" },
+  robots: "index,follow",
+  openGraph: {
+    title: "Blog — Spain Visa Guides & Expat Advice",
+    description: "Expert guides on Spain's Digital Nomad Visa, Non-Lucrative Visa, expat life, taxes, and banking.",
+    url: "https://www.digitalnomadinspain.com/blog",
+    type: "website",
+  },
 };
 
 type SanityPost = {

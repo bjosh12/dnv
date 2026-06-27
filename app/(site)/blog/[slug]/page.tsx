@@ -28,6 +28,7 @@ export async function generateMetadata({
     title: post.title ?? "Blog Post",
     description: post.excerpt ?? "",
     path: `/blog/${slug}`,
+    type: "article",
   });
 }
 
@@ -75,8 +76,29 @@ export default async function BlogPostPage({
       })
     : null;
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt ?? "",
+    image: imageUrl,
+    datePublished: post.publishedAt ?? undefined,
+    dateModified: post.publishedAt ?? undefined,
+    url: `https://www.digitalnomadinspain.com/blog/${slug}`,
+    publisher: {
+      "@type": "Organization",
+      name: "Digital Nomad In Spain",
+      url: "https://www.digitalnomadinspain.com",
+    },
+    ...(post.categories?.length && { keywords: post.categories.join(", ") }),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
       {/* Hero image */}
       <div className="relative h-72 sm:h-96 lg:h-[480px] overflow-hidden">
         <img

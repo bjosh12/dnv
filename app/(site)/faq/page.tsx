@@ -4,10 +4,13 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import FaqAccordion from "@/components/faq/FaqAccordion";
 import { getFaqItems } from "@/lib/sanity";
+import { SITE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "FAQ",
-  description: "Everything you need to know about Spain's residency visas — answered by our experts.",
+  title: { absolute: "FAQ — Spain Visa Questions Answered | Digital Nomad In Spain" },
+  description: "Everything you need to know about Spain's Digital Nomad Visa and Non-Lucrative Visa — income thresholds, documents, timelines, and more.",
+  alternates: { canonical: `${SITE_URL}/faq` },
+  robots: "index,follow",
 };
 
 export const revalidate = 60;
@@ -69,8 +72,28 @@ export default async function FaqPage() {
     }));
   }
 
+  // FAQPage structured data — all Q&As for rich results
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: sections.flatMap((s) =>
+      s.questions.map((q) => ({
+        "@type": "Question",
+        name: (q as { q?: string; question?: string }).q ?? (q as { question?: string }).question ?? "",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: (q as { a?: string; answer?: string }).a ?? (q as { answer?: string }).answer ?? "",
+        },
+      }))
+    ),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <section className="bg-[#1B3A6B] pt-32 pb-16 text-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Frequently Asked Questions</h1>
