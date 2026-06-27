@@ -4,6 +4,10 @@
 /public/sitemap*.xml
 /public/robots.txt
 
+# Sanity Studio build output and runtime
+/dist
+/.sanity
+
 # dependencies
 /node_modules
 /.pnp
