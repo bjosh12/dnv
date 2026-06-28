@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL, CONTACT_EMAIL, WHATSAPP_NUMBER } from "@/lib/constants";
+import { Analytics } from '@vercel/analytics/next';
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 
@@ -89,7 +90,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
