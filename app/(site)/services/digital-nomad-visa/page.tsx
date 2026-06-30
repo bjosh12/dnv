@@ -162,6 +162,151 @@ export default async function DigitalNomadVisaPage() {
                 </p>
               </div>
 
+              {/* Application route comparison */}
+              <div>
+                <h2 className="text-2xl font-bold text-[#0F1F3D] mb-2">
+                  Two Ways to Apply
+                </h2>
+                <p className="text-gray-600 text-sm leading-relaxed mb-6">
+                  Spain offers two distinct routes for the Digital Nomad Visa. The right one depends on where you are when you apply — and they have different income thresholds.
+                </p>
+
+                <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                  {/* Consulate route */}
+                  <div className="rounded-2xl border-2 border-[#1B3A6B]/20 bg-[#F7F9FD] p-5">
+                    <div className="inline-flex items-center gap-2 bg-[#1B3A6B] text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
+                      🏛️ Consulate Route
+                    </div>
+                    <p className="text-xs text-gray-500 mb-4">Apply from outside Spain at your nearest Spanish consulate</p>
+
+                    <dl className="space-y-2.5 text-sm mb-4">
+                      <div className="flex justify-between border-b border-gray-200 pb-2">
+                        <span className="text-gray-500">Who it&apos;s for</span>
+                        <span className="font-medium text-[#0F1F3D] text-right">Living abroad</span>
+                      </div>
+                      <div className="flex justify-between border-b border-gray-200 pb-2">
+                        <span className="text-gray-500">Where you apply</span>
+                        <span className="font-medium text-[#0F1F3D] text-right">Spanish consulate</span>
+                      </div>
+                      <div className="flex justify-between border-b border-gray-200 pb-2">
+                        <span className="text-gray-500">Processing time</span>
+                        <span className="font-medium text-[#0F1F3D] text-right">6–10 weeks</span>
+                      </div>
+                      <div className="flex justify-between border-b border-gray-200 pb-2">
+                        <span className="text-gray-500">Result</span>
+                        <span className="font-medium text-[#0F1F3D] text-right">Type D visa → TIE</span>
+                      </div>
+                    </dl>
+
+                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-4">
+                      <div className="bg-[#1B3A6B] text-white text-xs font-semibold px-3 py-2">
+                        Min. Income (2026)
+                      </div>
+                      {[
+                        { size: "Solo", amount: "€2,646" },
+                        { size: "+ 1 dependent", amount: "€3,108" },
+                        { size: "+ 2 dependents", amount: "€3,570" },
+                        { size: "+ 3 dependents", amount: "€4,032" },
+                      ].map((row) => (
+                        <div key={row.size} className="flex justify-between px-3 py-2 border-b border-gray-100 last:border-0">
+                          <span className="text-xs text-gray-500">{row.size}</span>
+                          <span className="text-xs font-semibold text-[#1B3A6B]">{row.amount}/mo</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <ul className="space-y-1.5">
+                      <li className="flex items-start gap-2 text-xs text-gray-600">
+                        <span className="text-green-500 shrink-0">✓</span>
+                        Apply from the comfort of home
+                      </li>
+                      <li className="flex items-start gap-2 text-xs text-gray-600">
+                        <span className="text-green-500 shrink-0">✓</span>
+                        Lower income threshold
+                      </li>
+                      <li className="flex items-start gap-2 text-xs text-gray-600">
+                        <span className="text-red-400 shrink-0">✗</span>
+                        Longer processing time
+                      </li>
+                      <li className="flex items-start gap-2 text-xs text-gray-600">
+                        <span className="text-red-400 shrink-0">✗</span>
+                        Quality varies by consulate
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* UGE route */}
+                  <div className="rounded-2xl border-2 border-[#FF6B35]/30 bg-[#FFF8F5] p-5">
+                    <div className="inline-flex items-center gap-2 bg-[#FF6B35] text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
+                      🇪🇸 UGE Route (In Spain)
+                    </div>
+                    <p className="text-xs text-gray-500 mb-4">Apply directly in Spain through the UGE (Unidad de Grandes Empresas)</p>
+
+                    <dl className="space-y-2.5 text-sm mb-4">
+                      <div className="flex justify-between border-b border-gray-200 pb-2">
+                        <span className="text-gray-500">Who it&apos;s for</span>
+                        <span className="font-medium text-[#0F1F3D] text-right">Already in Spain</span>
+                      </div>
+                      <div className="flex justify-between border-b border-gray-200 pb-2">
+                        <span className="text-gray-500">Where you apply</span>
+                        <span className="font-medium text-[#0F1F3D] text-right">UGE office, Madrid</span>
+                      </div>
+                      <div className="flex justify-between border-b border-gray-200 pb-2">
+                        <span className="text-gray-500">Processing time</span>
+                        <span className="font-medium text-[#0F1F3D] text-right">20–45 days</span>
+                      </div>
+                      <div className="flex justify-between border-b border-gray-200 pb-2">
+                        <span className="text-gray-500">Result</span>
+                        <span className="font-medium text-[#0F1F3D] text-right">Residency auth. → TIE</span>
+                      </div>
+                    </dl>
+
+                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-4">
+                      <div className="bg-[#FF6B35] text-white text-xs font-semibold px-3 py-2">
+                        Min. Income (2026)
+                      </div>
+                      {[
+                        { size: "Solo", amount: "€2,849" },
+                        { size: "+ 1 dependent", amount: "€3,324" },
+                        { size: "+ 2 dependents", amount: "€3,799" },
+                        { size: "+ 3 dependents", amount: "€4,274" },
+                      ].map((row) => (
+                        <div key={row.size} className="flex justify-between px-3 py-2 border-b border-gray-100 last:border-0">
+                          <span className="text-xs text-gray-500">{row.size}</span>
+                          <span className="text-xs font-semibold text-[#FF6B35]">{row.amount}/mo</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <ul className="space-y-1.5">
+                      <li className="flex items-start gap-2 text-xs text-gray-600">
+                        <span className="text-green-500 shrink-0">✓</span>
+                        Much faster processing
+                      </li>
+                      <li className="flex items-start gap-2 text-xs text-gray-600">
+                        <span className="text-green-500 shrink-0">✓</span>
+                        Consistent, centralised office
+                      </li>
+                      <li className="flex items-start gap-2 text-xs text-gray-600">
+                        <span className="text-green-500 shrink-0">✓</span>
+                        Live in Spain during process
+                      </li>
+                      <li className="flex items-start gap-2 text-xs text-gray-600">
+                        <span className="text-red-400 shrink-0">✗</span>
+                        Higher income threshold
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-[#EBF0FA] rounded-xl border border-[#1B3A6B]/10 flex items-start gap-3">
+                  <span className="text-lg shrink-0">💡</span>
+                  <p className="text-sm text-[#1B3A6B] leading-relaxed">
+                    <strong>Not sure which route fits you?</strong> We help clients with both. Book a free consultation and we&apos;ll map out the right strategy based on where you are and your income situation.
+                  </p>
+                </div>
+              </div>
+
               {/* Requirements */}
               <div>
                 <h2 className="text-2xl font-bold text-[#0F1F3D] mb-4">
