@@ -98,13 +98,12 @@ const ALL_COUNTRIES = [
 // ─── Income threshold table ──────────────────────────────────────────────────
 
 const INCOME_ROWS = [
-  { size: "Solo (just you)", amount: "€2,849" },
-  { size: "+ 1 person", amount: "€3,324" },
-  { size: "+ 2 people", amount: "€3,799" },
-  { size: "+ 3 people", amount: "€4,274" },
-  { size: "+ 4 people", amount: "€4,749" },
-  { size: "+ 5 people", amount: "€5,224" },
-  { size: "+ 6 or more", amount: "€5,698" },
+  { size: "1 applicant (solo)", amount: "€2,849" },
+  { size: "2 applicants", amount: "€3,917" },
+  { size: "3 applicants", amount: "€4,274" },
+  { size: "4 applicants", amount: "€4,630" },
+  { size: "5 applicants", amount: "€4,986" },
+  { size: "6 applicants", amount: "€5,342" },
 ];
 
 // ─── Steps ───────────────────────────────────────────────────────────────────

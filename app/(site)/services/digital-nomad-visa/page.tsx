@@ -203,10 +203,12 @@ export default async function DigitalNomadVisaPage() {
                         Min. Income (2026)
                       </div>
                       {[
-                        { size: "Solo", amount: "€2,646" },
-                        { size: "+ 1 dependent", amount: "€3,108" },
-                        { size: "+ 2 dependents", amount: "€3,570" },
-                        { size: "+ 3 dependents", amount: "€4,032" },
+                        { size: "1 applicant", amount: "€2,646" },
+                        { size: "2 applicants", amount: "€3,638" },
+                        { size: "3 applicants", amount: "€3,969" },
+                        { size: "4 applicants", amount: "€4,300" },
+                        { size: "5 applicants", amount: "€4,631" },
+                        { size: "6 applicants", amount: "€4,962" },
                       ].map((row) => (
                         <div key={row.size} className="flex justify-between px-3 py-2 border-b border-gray-100 last:border-0">
                           <span className="text-xs text-gray-500">{row.size}</span>
@@ -266,10 +268,12 @@ export default async function DigitalNomadVisaPage() {
                         Min. Income (2026)
                       </div>
                       {[
-                        { size: "Solo", amount: "€2,849" },
-                        { size: "+ 1 dependent", amount: "€3,324" },
-                        { size: "+ 2 dependents", amount: "€3,799" },
-                        { size: "+ 3 dependents", amount: "€4,274" },
+                        { size: "1 applicant", amount: "€2,849" },
+                        { size: "2 applicants", amount: "€3,917" },
+                        { size: "3 applicants", amount: "€4,274" },
+                        { size: "4 applicants", amount: "€4,630" },
+                        { size: "5 applicants", amount: "€4,986" },
+                        { size: "6 applicants", amount: "€5,342" },
                       ].map((row) => (
                         <div key={row.size} className="flex justify-between px-3 py-2 border-b border-gray-100 last:border-0">
                           <span className="text-xs text-gray-500">{row.size}</span>
@@ -296,6 +300,13 @@ export default async function DigitalNomadVisaPage() {
                         Higher income threshold
                       </li>
                     </ul>
+
+                    <div className="mt-4 p-3 bg-[#FF6B35]/10 border border-[#FF6B35]/20 rounded-xl flex items-start gap-2">
+                      <span className="shrink-0 text-base">⭐</span>
+                      <p className="text-xs text-[#0F1F3D] leading-relaxed">
+                        <strong>Recommended if you can.</strong> If your nationality allows visa-free entry to Spain, or you&apos;re willing to get a Schengen tourist visa first — the UGE route is strongly advisable. Faster, more consistent, and you start your Spanish life immediately.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
