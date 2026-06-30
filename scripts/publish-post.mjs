@@ -190,7 +190,7 @@ async function publish() {
     publishedAt: new Date().toISOString(),
     body: portableBody,
     ...(categoryId
-      ? { categories: [{ _type: "reference", _ref: categoryId }] }
+      ? { categories: [{ _key: categoryId, _type: "reference", _ref: categoryId }] }
       : {}),
     seo: {
       _type: "seoObject",

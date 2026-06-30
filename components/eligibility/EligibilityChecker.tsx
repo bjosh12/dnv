@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -10,6 +10,8 @@ import {
   AlertCircle,
   ExternalLink,
   Check,
+  Search,
+  X,
 } from "lucide-react";
 import { BOOKING_URL } from "@/lib/constants";
 
@@ -30,8 +32,8 @@ type StepDef = {
   sectionNum: number;
   question: string;
   subtext?: string;
-  incomeTable?: boolean; // shows the 2026 threshold table
-  type: "single" | "multi";
+  incomeTable?: boolean;
+  type: "single" | "multi" | "country-search";
   maxSelections?: number;
   options: Option[];
   earlyExit?: (value: string | string[], allAnswers: Answers) => Result | null;
@@ -46,6 +48,52 @@ type Result = {
   next: string;
   flags?: string[];
 };
+
+// ─── EU / EEA countries (for early-exit detection) ───────────────────────────
+
+const EU_EEA_SET = new Set([
+  "Austria","Belgium","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark",
+  "Estonia","Finland","France","Germany","Greece","Hungary","Ireland","Italy",
+  "Latvia","Lithuania","Luxembourg","Malta","Netherlands","Poland","Portugal",
+  "Romania","Slovakia","Slovenia","Spain","Sweden",
+  "Iceland","Liechtenstein","Norway", // EEA non-EU
+]);
+
+// ─── Full country list ────────────────────────────────────────────────────────
+
+const ALL_COUNTRIES = [
+  "Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda",
+  "Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain",
+  "Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan",
+  "Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria",
+  "Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada",
+  "Central African Republic","Chad","Chile","China","Colombia","Comoros",
+  "Congo (Brazzaville)","Congo (Kinshasa)","Costa Rica","Croatia","Cuba",
+  "Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic",
+  "Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia",
+  "Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia",
+  "Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau",
+  "Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran",
+  "Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan",
+  "Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho",
+  "Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar",
+  "Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania",
+  "Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro",
+  "Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands",
+  "New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia",
+  "Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea",
+  "Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania",
+  "Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia",
+  "Saint Vincent and the Grenadines","Samoa","San Marino","São Tomé and Príncipe",
+  "Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore",
+  "Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea",
+  "South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland",
+  "Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo",
+  "Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu",
+  "Uganda","Ukraine","United Arab Emirates","United Kingdom","United States",
+  "Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Yemen",
+  "Zambia","Zimbabwe",
+];
 
 // ─── Income threshold table ──────────────────────────────────────────────────
 
@@ -68,20 +116,13 @@ const steps: StepDef[] = [
     section: "Legal Eligibility",
     sectionNum: 1,
     question: "What passport(s) do you hold?",
-    subtext: "Select up to 3 if you hold dual or triple citizenship.",
-    type: "multi",
+    subtext: "Search and select up to 3 — useful if you hold dual or triple citizenship.",
+    type: "country-search",
     maxSelections: 3,
-    options: [
-      { label: "EU / EEA country", value: "eu", icon: "🇪🇺", sublabel: "Austria, Germany, France, etc." },
-      { label: "United Kingdom", value: "uk", icon: "🇬🇧" },
-      { label: "United States", value: "us", icon: "🇺🇸" },
-      { label: "Canada", value: "ca", icon: "🇨🇦" },
-      { label: "Australia or New Zealand", value: "au-nz", icon: "🇦🇺" },
-      { label: "Other country", value: "other", icon: "🌍", sublabel: "Not listed above" },
-    ],
+    options: [],
     earlyExit: (value) => {
       const selected = value as string[];
-      if (selected.includes("eu")) {
+      if (selected.some((c) => EU_EEA_SET.has(c))) {
         return {
           status: "not-eligible",
           label: "No visa needed",
@@ -337,17 +378,10 @@ const steps: StepDef[] = [
     section: "Travel & Documents",
     sectionNum: 6,
     question: "Where do you currently live?",
-    subtext: "Select up to 3 if you split your time between countries.",
-    type: "multi",
+    subtext: "Search and select up to 3 if you split your time between countries.",
+    type: "country-search",
     maxSelections: 3,
-    options: [
-      { label: "United States", value: "us", icon: "🇺🇸" },
-      { label: "United Kingdom", value: "uk", icon: "🇬🇧" },
-      { label: "Canada", value: "ca", icon: "🇨🇦" },
-      { label: "Australia or New Zealand", value: "au-nz", icon: "🇦🇺" },
-      { label: "EU / EEA country", value: "eu", icon: "🇪🇺" },
-      { label: "Somewhere else", value: "other", icon: "🌍" },
-    ],
+    options: [],
   },
   {
     id: "submission_location",
@@ -381,17 +415,10 @@ const steps: StepDef[] = [
     sectionNum: 6,
     question:
       "Which countries have you officially lived in over the past 2 years? (for criminal record certificates)",
-    subtext: "You'll need to obtain a police clearance certificate from each country listed.",
-    type: "multi",
+    subtext: "You'll need to obtain a police clearance certificate from each country listed. Select up to 3.",
+    type: "country-search",
     maxSelections: 3,
-    options: [
-      { label: "United States", value: "us", icon: "🇺🇸" },
-      { label: "United Kingdom", value: "uk", icon: "🇬🇧" },
-      { label: "Canada", value: "ca", icon: "🇨🇦" },
-      { label: "Australia or New Zealand", value: "au-nz", icon: "🇦🇺" },
-      { label: "EU / EEA country", value: "eu", icon: "🇪🇺" },
-      { label: "Somewhere else", value: "other", icon: "🌍" },
-    ],
+    options: [],
   },
 ];
 
@@ -577,6 +604,126 @@ function IncomeTable() {
   );
 }
 
+// ─── Country search combobox ──────────────────────────────────────────────────
+
+function CountrySearchInput({
+  selected,
+  max,
+  search,
+  onSearchChange,
+  onToggle,
+  onContinue,
+}: {
+  selected: string[];
+  max: number;
+  search: string;
+  onSearchChange: (v: string) => void;
+  onToggle: (v: string) => void;
+  onContinue: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const filtered = search.trim().length < 1
+    ? []
+    : ALL_COUNTRIES.filter(
+        (c) =>
+          c.toLowerCase().includes(search.toLowerCase()) &&
+          !selected.includes(c)
+      ).slice(0, 8);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  function pick(country: string) {
+    if (selected.length < max) onToggle(country);
+    onSearchChange("");
+    setOpen(false);
+  }
+
+  return (
+    <div>
+      {/* Selected chips */}
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {selected.map((c) => (
+            <span
+              key={c}
+              className="inline-flex items-center gap-1.5 bg-[#EBF0FA] text-[#1B3A6B] text-xs font-semibold px-3 py-1.5 rounded-full"
+            >
+              {c}
+              <button
+                onClick={() => onToggle(c)}
+                className="hover:text-[#E85520] transition-colors"
+                aria-label={`Remove ${c}`}
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Search input */}
+      {selected.length < max && (
+        <div ref={containerRef} className="relative mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => {
+                onSearchChange(e.target.value);
+                setOpen(true);
+              }}
+              onFocus={() => setOpen(true)}
+              placeholder="Type to search countries…"
+              className="w-full pl-9 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#1B3A6B] outline-none text-sm text-gray-700 transition-colors"
+            />
+          </div>
+
+          {/* Dropdown */}
+          {open && filtered.length > 0 && (
+            <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+              {filtered.map((c) => (
+                <button
+                  key={c}
+                  onMouseDown={(e) => { e.preventDefault(); pick(c); }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-[#EBF0FA] hover:text-[#1B3A6B] transition-colors"
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {open && search.trim().length > 0 && filtered.length === 0 && (
+            <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 text-sm text-gray-400">
+              No countries found
+            </div>
+          )}
+        </div>
+      )}
+
+      <button
+        onClick={onContinue}
+        disabled={selected.length === 0}
+        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#1B3A6B] text-white font-semibold text-sm hover:bg-[#0F1F3D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Continue
+        <ArrowRight className="w-4 h-4" />
+      </button>
+    </div>
+  );
+}
+
 // ─── Main component ──────────────────────────────────────────────────────────
 
 export default function EligibilityChecker() {
@@ -584,6 +731,7 @@ export default function EligibilityChecker() {
   const [answers, setAnswers] = useState<Answers>({});
   const [multiSelection, setMultiSelection] = useState<string[]>([]);
   const [result, setResult] = useState<Result | null>(null);
+  const [countrySearch, setCountrySearch] = useState("");
 
   const visibleSteps = steps;
   const totalSteps = visibleSteps.length;
@@ -596,6 +744,7 @@ export default function EligibilityChecker() {
     const newAnswers = { ...answers, [step.id]: value };
     setAnswers(newAnswers);
     setMultiSelection([]);
+    setCountrySearch("");
 
     // Check for early exit on this step
     if (step.earlyExit) {
@@ -637,9 +786,11 @@ export default function EligibilityChecker() {
     if (result) {
       setResult(null);
       setMultiSelection([]);
+      setCountrySearch("");
     } else if (stepIndex > 0) {
       setStepIndex(stepIndex - 1);
       setMultiSelection([]);
+      setCountrySearch("");
     }
   }
 
@@ -648,6 +799,7 @@ export default function EligibilityChecker() {
     setResult(null);
     setStepIndex(0);
     setMultiSelection([]);
+    setCountrySearch("");
   }
 
   const cfg = result ? statusConfig[result.status] : null;
@@ -729,6 +881,16 @@ export default function EligibilityChecker() {
                   </button>
                 ))}
               </div>
+            ) : step.type === "country-search" ? (
+              /* Country search combobox */
+              <CountrySearchInput
+                selected={multiSelection}
+                max={step.maxSelections ?? 3}
+                search={countrySearch}
+                onSearchChange={setCountrySearch}
+                onToggle={toggleMulti}
+                onContinue={handleMultiContinue}
+              />
             ) : (
               /* Multi-select */
               <div>
