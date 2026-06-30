@@ -186,7 +186,7 @@ export default async function DigitalNomadVisaPage() {
                       </div>
                       <div className="flex justify-between border-b border-gray-200 pb-2">
                         <span className="text-gray-500">Where you apply</span>
-                        <span className="font-medium text-[#0F1F3D] text-right">Spanish consulate</span>
+                        <span className="font-medium text-[#0F1F3D] text-right">Via BLS International</span>
                       </div>
                       <div className="flex justify-between border-b border-gray-200 pb-2">
                         <span className="text-gray-500">Processing time</span>
@@ -251,7 +251,7 @@ export default async function DigitalNomadVisaPage() {
                       </div>
                       <div className="flex justify-between border-b border-gray-200 pb-2">
                         <span className="text-gray-500">Where you apply</span>
-                        <span className="font-medium text-[#0F1F3D] text-right">UGE office, Madrid</span>
+                        <span className="font-medium text-[#0F1F3D] text-right">Online (digital cert. or via us)</span>
                       </div>
                       <div className="flex justify-between border-b border-gray-200 pb-2">
                         <span className="text-gray-500">Processing time</span>
