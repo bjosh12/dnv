@@ -27,10 +27,10 @@ export const NAV_LINKS = [
 ];
 
 export const SOCIAL_LINKS = {
-  instagram: "https://instagram.com/digitalnomadrespain",
-  facebook: "https://facebook.com/digitalnomadrespain",
-  linkedin: "https://linkedin.com/company/digitalnomadrespain",
-  youtube: "https://youtube.com/@digitalnomadrespain",
+  instagram: "https://instagram.com/digitalnomadinspain",
+  facebook: "https://facebook.com/digitalnomadinspain",
+  linkedin: "https://linkedin.com/company/digitalnomadinspain",
+  youtube: "https://youtube.com/@digitalnomadinspain",
 };
 
 export const DNV_INCOME_THRESHOLD = 2646; // EUR/month

@@ -43,7 +43,7 @@ export default function Hero({ data }: { data?: Partial<typeof DEFAULTS> | null 
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-            {d.heroHeadline}
+            {d.heroHeadline}{" "}
             <span className="block text-[#FF6B35]">{d.heroSubheadline}</span>
           </h1>
 
