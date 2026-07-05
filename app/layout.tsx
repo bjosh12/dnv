@@ -97,6 +97,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable} scroll-smooth`}>
       <head>
+        {/* Google tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-E7LWQS7L08"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-E7LWQS7L08');`,
+          }}
+        />
         {/* Preconnect to third-party image CDNs for faster LCP */}
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="preconnect" href="https://cdn.sanity.io" />
