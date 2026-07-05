@@ -17,19 +17,23 @@ export async function generateMetadata({
   const { slug } = await params;
   const { data: raw } = await sanityFetch({
     query: `*[_type == "post" && slug.current == $slug][0] {
-      title, excerpt,
+      title, excerpt, mainImage,
       seo { title, description, "imageUrl": image.asset->url, noIndex }
     }`,
     params: { slug },
   }).catch(() => ({ data: null }));
-  const post = raw as { title?: string; excerpt?: string; seo?: { title?: string; description?: string; imageUrl?: string; noIndex?: boolean } } | null;
+  const post = raw as { title?: string; excerpt?: string; mainImage?: Parameters<typeof urlFor>[0]; seo?: { title?: string; description?: string; imageUrl?: string; noIndex?: boolean } } | null;
   if (!post) return { title: "Post Not Found" };
-  return buildMetadata(post.seo, {
-    title: post.title ?? "Blog Post",
-    description: post.excerpt ?? "",
-    path: `/blog/${slug}`,
-    type: "article",
-  });
+  const mainImageUrl = post.mainImage ? urlFor(post.mainImage).width(1200).height(630).url() : undefined;
+  return buildMetadata(
+    { ...post.seo, imageUrl: post.seo?.imageUrl || mainImageUrl },
+    {
+      title: post.title ?? "Blog Post",
+      description: post.excerpt ?? "",
+      path: `/blog/${slug}`,
+      type: "article",
+    }
+  );
 }
 
 export default async function BlogPostPage({
