@@ -72,28 +72,8 @@ export default async function FaqPage() {
     }));
   }
 
-  // FAQPage structured data — all Q&As for rich results
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: sections.flatMap((s) =>
-      s.questions.map((q) => ({
-        "@type": "Question",
-        name: (q as { q?: string; question?: string }).q ?? (q as { question?: string }).question ?? "",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: (q as { a?: string; answer?: string }).a ?? (q as { answer?: string }).answer ?? "",
-        },
-      }))
-    ),
-  };
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
       <section className="bg-[#1B3A6B] pt-32 pb-16 text-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Frequently Asked Questions</h1>

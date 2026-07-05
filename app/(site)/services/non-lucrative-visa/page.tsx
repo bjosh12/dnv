@@ -85,7 +85,7 @@ export default async function NonLucrativeVisaPage() {
     provider: { "@type": "Organization", name: "Digital Nomad In Spain", url: "https://www.digitalnomadinspain.com" },
     areaServed: "Worldwide",
     url: "https://www.digitalnomadinspain.com/services/non-lucrative-visa",
-    offers: { "@type": "Offer", price: pricingFrom.replace("€", ""), priceCurrency: "EUR", description: pricingNote },
+    offers: { "@type": "Offer", price: pricingFrom.replace(/[€,]/g, ""), priceCurrency: "EUR", description: pricingNote },
   };
 
   return (
