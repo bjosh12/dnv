@@ -48,7 +48,28 @@ const organizationSchema = {
   email: CONTACT_EMAIL,
   description: SITE_TAGLINE,
   areaServed: "Worldwide",
-  serviceType: "Immigration Consulting",
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Spain Visa Consulting Services",
+    itemListElement: [
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Digital Nomad Visa Consulting",
+          url: `${SITE_URL}/services/digital-nomad-visa`,
+        },
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Non-Lucrative Visa Consulting",
+          url: `${SITE_URL}/services/non-lucrative-visa`,
+        },
+      },
+    ],
+  },
   logo: {
     "@type": "ImageObject",
     url: `${SITE_URL}/icon.svg`,

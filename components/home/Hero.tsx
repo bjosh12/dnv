@@ -20,12 +20,13 @@ export default function Hero({ data }: { data?: Partial<typeof DEFAULTS> | null 
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
         <Image
-          src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=1920&q=85"
+          src="/hero-barcelona.webp"
           alt="Barcelona Spain skyline"
           fill
           preload
           fetchPriority="high"
-          sizes="100vw"
+          sizes="(max-width: 768px) 100vw, 100vw"
+          quality={80}
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/20" />

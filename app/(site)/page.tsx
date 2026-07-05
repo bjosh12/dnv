@@ -8,7 +8,7 @@ import WhyUs from "@/components/home/WhyUs";
 import Testimonials from "@/components/home/Testimonials";
 import BlogPreview from "@/components/home/BlogPreview";
 import CTABanner from "@/components/home/CTABanner";
-import Newsletter from "@/components/home/Newsletter";
+import Newsletter from "@/components/home/NewsletterLazy";
 import { getHomePage, getTestimonials, getPosts, getSiteSettings } from "@/lib/sanity";
 import { buildMetadata } from "@/lib/seo";
 

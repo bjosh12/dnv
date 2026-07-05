@@ -2,8 +2,8 @@ import { draftMode } from "next/headers";
 import { VisualEditing } from "next-sanity/visual-editing";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
-import CookieBanner from "@/components/layout/CookieBanner";
+import WhatsAppButton from "@/components/layout/WhatsAppButtonLazy";
+import CookieBanner from "@/components/layout/CookieBannerLazy";
 import { SanityLive } from "@/lib/live";
 import { getSiteSettings } from "@/lib/sanity";
 
