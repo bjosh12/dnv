@@ -110,6 +110,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
+        <script src="https://analytics.ahrefs.com/analytics.js" data-key="VcseBjHNHrsuMfAGsu3W5w" async></script>
       </head>
       <body className="antialiased">
         {children}
