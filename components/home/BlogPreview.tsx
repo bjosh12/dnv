@@ -65,7 +65,7 @@ export default function BlogPreview({ posts }: { posts?: typeof placeholderPosts
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
           <div>
-            <span className="text-[#FF6B35] text-sm font-semibold uppercase tracking-wider">
+            <span className="text-[#C2410C] text-sm font-semibold uppercase tracking-wider">
               From the Blog
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F3D] mt-2">
@@ -113,7 +113,7 @@ export default function BlogPreview({ posts }: { posts?: typeof placeholderPosts
                 <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 flex-1">
                   {post.excerpt}
                 </p>
-                <div className="flex items-center gap-1 mt-4 text-xs font-semibold text-[#FF6B35]">
+                <div className="flex items-center gap-1 mt-4 text-xs font-semibold text-[#C2410C]">
                   Read more
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </div>

@@ -35,7 +35,7 @@ export default function WhyUs({ data }: { data?: { whyUsPoints?: Point[] } | nul
             </div>
             <div className="absolute -bottom-6 -right-6 bg-white rounded-2xl shadow-xl p-5 border border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="text-3xl font-bold text-[#FF6B35]">98%</div>
+                <div className="text-3xl font-bold text-[#C2410C]">98%</div>
                 <div className="text-xs text-gray-600 leading-tight">
                   Visa approval
                   <span className="block font-semibold text-[#1B3A6B]">success rate</span>
@@ -46,7 +46,7 @@ export default function WhyUs({ data }: { data?: { whyUsPoints?: Point[] } | nul
 
           {/* Right: Content */}
           <div className="order-1 lg:order-2">
-            <span className="text-[#FF6B35] text-sm font-semibold uppercase tracking-wider">Why Choose Us</span>
+            <span className="text-[#C2410C] text-sm font-semibold uppercase tracking-wider">Why Choose Us</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F3D] mt-2 mb-4">
               Spain visa experts you can actually trust
             </h2>
@@ -64,7 +64,7 @@ export default function WhyUs({ data }: { data?: { whyUsPoints?: Point[] } | nul
                       <Icon className="w-5 h-5 text-[#1B3A6B]" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-[#0F1F3D] text-sm mb-1">{p.title}</h4>
+                      <h3 className="font-semibold text-[#0F1F3D] text-sm mb-1">{p.title}</h3>
                       <p className="text-xs text-gray-600 leading-relaxed">{p.description}</p>
                     </div>
                   </div>

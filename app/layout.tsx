@@ -4,7 +4,7 @@ import "./globals.css";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL, CONTACT_EMAIL, WHATSAPP_NUMBER } from "@/lib/constants";
 import { Analytics } from '@vercel/analytics/next';
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans", display: "swap" });
 
 export const metadata: Metadata = {
   title: {
@@ -48,7 +48,7 @@ const organizationSchema = {
   email: CONTACT_EMAIL,
   description: SITE_TAGLINE,
   areaServed: "Worldwide",
-  serviceType: ["Digital Nomad Visa Consulting", "Non-Lucrative Visa Consulting", "Spain Immigration Consulting"],
+  serviceType: "Immigration Consulting",
   logo: {
     "@type": "ImageObject",
     url: `${SITE_URL}/icon.svg`,

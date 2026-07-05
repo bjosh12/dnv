@@ -57,7 +57,7 @@ export default function Testimonials({ data }: { data?: SanityTestimonial[] | nu
     <section className="py-24 bg-[#F7F8FC]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <span className="text-[#FF6B35] text-sm font-semibold uppercase tracking-wider">
+          <span className="text-[#C2410C] text-sm font-semibold uppercase tracking-wider">
             Client Stories
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F3D] mt-2 mb-4">
@@ -71,7 +71,7 @@ export default function Testimonials({ data }: { data?: SanityTestimonial[] | nu
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {items.map((t) => (
             <div key={t._id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="text-5xl text-[#FF6B35] font-serif leading-none mb-4">&quot;</div>
+              <div className="text-5xl text-[#C2410C] font-serif leading-none mb-4">&quot;</div>
               <p className="text-gray-700 text-sm leading-relaxed mb-6">{t.quote}</p>
               <div className="flex items-center gap-3">
                 {t.avatarUrl && (

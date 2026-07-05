@@ -43,7 +43,7 @@ export default function ServicesOverview({ data }: { data?: ServicesData | null 
     <section className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <span className="text-[#FF6B35] text-sm font-semibold uppercase tracking-wider">Our Services</span>
+          <span className="text-[#C2410C] text-sm font-semibold uppercase tracking-wider">Our Services</span>
           <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F3D] mt-2 mb-4">
             Two paths to your life in Spain
           </h2>
@@ -91,7 +91,7 @@ export default function ServicesOverview({ data }: { data?: ServicesData | null 
                   className="inline-flex items-center gap-2 font-semibold text-sm transition-colors group"
                   style={{ color: service.color }}
                 >
-                  Learn more
+                  Learn more about the {service.title}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>

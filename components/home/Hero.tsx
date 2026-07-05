@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { LakbyteAmbassadorBadge } from "@/components/ui/LakbyteBadge";
@@ -18,10 +19,14 @@ export default function Hero({ data }: { data?: Partial<typeof DEFAULTS> | null 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
-        <img
+        <Image
           src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=1920&q=85"
           alt="Barcelona Spain skyline"
-          className="w-full h-full object-cover"
+          fill
+          preload
+          fetchPriority="high"
+          sizes="100vw"
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/20" />
       </div>

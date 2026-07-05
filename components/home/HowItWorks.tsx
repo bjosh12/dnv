@@ -12,7 +12,7 @@ export default function HowItWorks({ data }: { data?: { howItWorksSteps?: typeof
     <section className="py-24 bg-[#F7F8FC]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <span className="text-[#FF6B35] text-sm font-semibold uppercase tracking-wider">Simple Process</span>
+          <span className="text-[#C2410C] text-sm font-semibold uppercase tracking-wider">Simple Process</span>
           <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F3D] mt-2 mb-4">How it works</h2>
           <p className="text-gray-600 max-w-xl mx-auto text-lg">
             We&apos;ve helped hundreds of people move to Spain. Here&apos;s exactly how we do it.
