@@ -1,0 +1,69 @@
+const BASE_URL = process.env.BABYLOVEGROWTH_API_URL || "https://api.babylovegrowth.ai/api/integrations";
+const API_KEY = process.env.BABYLOVEGROWTH_API_KEY;
+
+export type BlogArticleSummary = {
+  id: number;
+  title: string;
+  slug: string;
+  hero_image_url?: string;
+  languageCode?: string;
+  meta_description?: string;
+  excerpt?: string;
+  orgWebsite?: string;
+  created_at: string;
+  seedKeyword?: string;
+  keywords?: string[];
+};
+
+export type BlogArticle = BlogArticleSummary & {
+  content_html: string;
+  content_markdown: string;
+  jsonLd?: Record<string, unknown>;
+  faqJsonLd?: Record<string, unknown>;
+};
+
+function authHeaders() {
+  return { "X-API-Key": API_KEY ?? "", "Content-Type": "application/json" };
+}
+
+export async function fetchArticles(limit = 50, offset = 0): Promise<BlogArticleSummary[]> {
+  if (!API_KEY) return [];
+  const res = await fetch(`${BASE_URL}/v1/articles?limit=${limit}&offset=${offset}`, {
+    headers: authHeaders(),
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+// The list endpoint is the only way to resolve a slug — there's no by-slug lookup.
+export async function fetchAllArticles(): Promise<BlogArticleSummary[]> {
+  const all: BlogArticleSummary[] = [];
+  const limit = 50;
+  let offset = 0;
+  while (true) {
+    const page = await fetchArticles(limit, offset);
+    if (page.length === 0) break;
+    all.push(...page);
+    if (page.length < limit) break;
+    offset += limit;
+  }
+  return all;
+}
+
+export async function fetchArticleById(id: number): Promise<BlogArticle | null> {
+  if (!API_KEY) return null;
+  const res = await fetch(`${BASE_URL}/v1/articles/${id}`, {
+    headers: authHeaders(),
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function fetchArticleBySlug(slug: string): Promise<BlogArticle | null> {
+  const all = await fetchAllArticles();
+  const match = all.find((a) => a.slug === slug);
+  if (!match) return null;
+  return fetchArticleById(match.id);
+}

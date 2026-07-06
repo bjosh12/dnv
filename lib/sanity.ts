@@ -34,12 +34,12 @@ export function urlFor(source: Parameters<typeof builder.image>[0]) {
   return builder.image(source);
 }
 
-// ── Blog ─────────────────────────────────────────────────────────────────────
+// ── Blog (manually authored posts, merged with BabyLoveGrowth articles) ───────
 
-export async function getPosts(limit = 10, preview = false) {
+export async function getPosts(limit = 50, preview = false) {
   return getClient(preview).fetch(
     `*[_type == "post"] | order(publishedAt desc) [0...$limit] {
-      _id, title, slug, publishedAt, excerpt, mainImage, "categories": categories[]->title
+      _id, title, "slug": slug.current, publishedAt, excerpt, mainImage, "categories": categories[]->title
     }`,
     { limit }
   );

@@ -9,7 +9,8 @@ import Testimonials from "@/components/home/Testimonials";
 import BlogPreview from "@/components/home/BlogPreview";
 import CTABanner from "@/components/home/CTABanner";
 import Newsletter from "@/components/home/NewsletterLazy";
-import { getHomePage, getTestimonials, getPosts, getSiteSettings } from "@/lib/sanity";
+import { getHomePage, getTestimonials, getSiteSettings } from "@/lib/sanity";
+import { getMergedPosts } from "@/lib/blog";
 import { buildMetadata } from "@/lib/seo";
 
 export const revalidate = 60;
@@ -26,12 +27,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   const { isEnabled: preview } = await draftMode();
 
-  const [homePage, testimonials, posts, siteSettings] = await Promise.all([
+  const [homePage, testimonials, allPosts, siteSettings] = await Promise.all([
     getHomePage(preview),
     getTestimonials(preview),
-    getPosts(3, preview),
+    getMergedPosts(preview),
     getSiteSettings(preview),
   ]);
+  const posts = allPosts.slice(0, 3);
 
   return (
     <>

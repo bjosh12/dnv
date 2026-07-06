@@ -1,50 +1,43 @@
 import Link from "next/link";
 import { ArrowRight, Calendar } from "lucide-react";
-import { urlFor } from "@/lib/sanity";
+import type { NormalizedPostSummary } from "@/lib/blog";
 
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80";
 
-function getImageSrc(mainImage: unknown): string {
-  if (!mainImage) return FALLBACK_IMAGE;
-  if (typeof mainImage === "string") return mainImage;
-  try {
-    return urlFor(mainImage).width(700).height(300).url();
-  } catch {
-    return FALLBACK_IMAGE;
-  }
-}
-
-// Placeholder posts until Sanity is connected
-const placeholderPosts = [
+// Placeholder posts until Sanity/BabyLoveGrowth have content
+const placeholderPosts: NormalizedPostSummary[] = [
   {
-    _id: "1",
+    id: "placeholder-1",
     title: "Spain's Digital Nomad Visa: Everything You Need to Know in 2025",
-    slug: { current: "spain-digital-nomad-visa-guide-2025" },
+    slug: "spain-digital-nomad-visa-guide-2025",
     excerpt:
       "A comprehensive guide to Spain's Digital Nomad Visa — requirements, income thresholds, documents, and timeline.",
     publishedAt: "2025-03-15",
-    categories: ["Digital Nomad Visa"],
-    mainImage: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80",
+    tags: ["Digital Nomad Visa"],
+    imageUrl: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80",
+    source: "sanity",
   },
   {
-    _id: "2",
+    id: "placeholder-2",
     title: "Non-Lucrative Visa vs Digital Nomad Visa: Which Is Right for You?",
-    slug: { current: "nlv-vs-dnv-comparison" },
+    slug: "nlv-vs-dnv-comparison",
     excerpt:
       "Breaking down the key differences between Spain's two most popular long-stay visas to help you choose the right path.",
     publishedAt: "2025-02-28",
-    categories: ["Non-Lucrative Visa"],
-    mainImage: "https://images.unsplash.com/photo-1555990793-da11153b6c8d?auto=format&fit=crop&w=700&q=80",
+    tags: ["Non-Lucrative Visa"],
+    imageUrl: "https://images.unsplash.com/photo-1555990793-da11153b6c8d?auto=format&fit=crop&w=700&q=80",
+    source: "sanity",
   },
   {
-    _id: "3",
+    id: "placeholder-3",
     title: "Banking in Spain as an Expat: How to Open a Bank Account",
-    slug: { current: "banking-spain-expat-guide" },
+    slug: "banking-spain-expat-guide",
     excerpt:
       "Step-by-step guide to opening a Spanish bank account as a non-resident — the banks that actually work for expats.",
     publishedAt: "2025-02-10",
-    categories: ["Spain Life"],
-    mainImage: "https://images.unsplash.com/photo-1464820453369-31d2c0b651af?auto=format&fit=crop&w=700&q=80",
+    tags: ["Spain Life"],
+    imageUrl: "https://images.unsplash.com/photo-1464820453369-31d2c0b651af?auto=format&fit=crop&w=700&q=80",
+    source: "sanity",
   },
 ];
 
@@ -57,7 +50,7 @@ function formatDate(dateStr: string | null | undefined) {
   });
 }
 
-export default function BlogPreview({ posts }: { posts?: typeof placeholderPosts | null }) {
+export default function BlogPreview({ posts }: { posts?: NormalizedPostSummary[] | null }) {
   const displayPosts = posts?.length ? posts : placeholderPosts;
 
   return (
@@ -84,19 +77,19 @@ export default function BlogPreview({ posts }: { posts?: typeof placeholderPosts
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {displayPosts.map((post) => (
             <Link
-              key={post._id}
-              href={`/blog/${post.slug.current}`}
+              key={post.id}
+              href={`/blog/${post.slug}`}
               className="group flex flex-col rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
             >
               <div className="relative h-44 overflow-hidden">
                 <img
-                  src={getImageSrc(post.mainImage)}
+                  src={post.imageUrl || FALLBACK_IMAGE}
                   alt={post.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                {post.categories?.[0] && (
+                {post.tags[0] && (
                   <span className="absolute top-3 left-3 bg-[#1B3A6B] text-white text-xs font-medium px-2.5 py-1 rounded-full">
-                    {post.categories[0]}
+                    {post.tags[0]}
                   </span>
                 )}
               </div>

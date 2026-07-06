@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Calendar, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { sanityFetch } from "@/lib/live";
-import { urlFor } from "@/lib/sanity";
+import { draftMode } from "next/headers";
+import { getMergedPosts } from "@/lib/blog";
 
 export const revalidate = 60;
 
@@ -20,30 +20,6 @@ export const metadata: Metadata = {
   },
 };
 
-type SanityPost = {
-  _id: string;
-  title: string;
-  slug: string;
-  excerpt?: string;
-  publishedAt?: string;
-  mainImage?: unknown;
-  categories?: string[];
-  featured?: boolean;
-};
-
-const POSTS_QUERY = `*[_type == "post"] | order(publishedAt desc) {
-  _id,
-  title,
-  "slug": slug.current,
-  excerpt,
-  publishedAt,
-  mainImage,
-  "categories": categories[]->title,
-  featured
-}`;
-
-const ALL_CATEGORIES = ["All", "Digital Nomad Visa", "Non-Lucrative Visa", "Spain Life", "Taxes & Banking", "Success Stories", "After Approval", "Comparison", "After Approval"];
-
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-US", {
     month: "long",
@@ -52,25 +28,16 @@ function formatDate(dateStr: string) {
   });
 }
 
-function getImageUrl(mainImage: unknown): string {
-  if (!mainImage) return "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80";
-  try {
-    return urlFor(mainImage).width(700).height(400).url();
-  } catch {
-    return "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80";
-  }
-}
-
 export default async function BlogPage() {
-  const { data: rawPosts } = await sanityFetch({ query: POSTS_QUERY }).catch(() => ({ data: [] }));
-  const posts = (rawPosts ?? []) as SanityPost[];
+  const { isEnabled: preview } = await draftMode();
+  const posts = await getMergedPosts(preview);
 
-  // Derive unique categories from actual posts, keeping a sensible order
-  const postCategories = Array.from(new Set(posts.flatMap((p) => p.categories ?? [])));
-  const categories = ["All", ...ALL_CATEGORIES.filter((c) => c !== "All" && postCategories.includes(c)), ...postCategories.filter((c) => !ALL_CATEGORIES.includes(c))];
+  // Derive category chips from posts' tags
+  const categories = ["All", ...Array.from(new Set(posts.flatMap((p) => p.tags)))];
 
-  const featured = posts.find((p) => p.featured) ?? posts[0] ?? null;
-  const rest = posts.filter((p) => p._id !== featured?._id);
+  // Posts are already sorted newest first
+  const featured = posts[0] ?? null;
+  const rest = posts.slice(1);
 
   return (
     <>
@@ -112,7 +79,7 @@ export default async function BlogPage() {
               <div className="grid md:grid-cols-2">
                 <div className="relative h-64 md:h-auto overflow-hidden">
                   <img
-                    src={getImageUrl(featured.mainImage)}
+                    src={featured.imageUrl}
                     alt={featured.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -121,9 +88,9 @@ export default async function BlogPage() {
                   </span>
                 </div>
                 <div className="p-8 flex flex-col justify-center">
-                  {featured.categories?.[0] && (
+                  {featured.tags[0] && (
                     <span className="text-xs font-semibold text-[#1B3A6B] uppercase tracking-wider mb-2">
-                      {featured.categories[0]}
+                      {featured.tags[0]}
                     </span>
                   )}
                   <h2 className="text-2xl font-bold text-[#0F1F3D] mb-3 group-hover:text-[#1B3A6B] transition-colors leading-snug">
@@ -163,19 +130,19 @@ export default async function BlogPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {rest.map((post) => (
               <Link
-                key={post._id}
+                key={post.id}
                 href={`/blog/${post.slug}`}
                 className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
               >
                 <div className="relative h-44 overflow-hidden">
                   <img
-                    src={getImageUrl(post.mainImage)}
+                    src={post.imageUrl}
                     alt={post.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  {post.categories?.[0] && (
+                  {post.tags[0] && (
                     <span className="absolute top-3 left-3 bg-[#1B3A6B] text-white text-xs font-medium px-2.5 py-1 rounded-full">
-                      {post.categories[0]}
+                      {post.tags[0]}
                     </span>
                   )}
                 </div>
