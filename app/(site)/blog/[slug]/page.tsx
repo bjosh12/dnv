@@ -93,16 +93,19 @@ export default async function BlogPostPage({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-4 gap-12">
               <article className="lg:col-span-3">
-                {post.excerpt && (
+                {/* The detail endpoint's `excerpt` field is unreliable (can return a
+                    mangled title+image-alt+body blob) — meta_description is clean. */}
+                {post.meta_description && (
                   <p className="text-lg text-gray-600 leading-relaxed mb-8 font-medium border-l-4 border-[#FF6B35] pl-4">
-                    {post.excerpt}
+                    {post.meta_description}
                   </p>
                 )}
                 <div
                   className="prose prose-lg max-w-none text-gray-700 prose-headings:text-[#0F1F3D] prose-a:text-[#FF6B35]"
                   dangerouslySetInnerHTML={{ __html: stripDuplicateLead(post.content_html) }}
                 />
-                <TagFooter tags={post.keywords ?? []} />
+                {/* post.keywords is BabyLoveGrowth's internal SEO keyword-targeting
+                    list, not editorial tags — not meant for public display. */}
               </article>
               <ConsultSidebar />
             </div>
