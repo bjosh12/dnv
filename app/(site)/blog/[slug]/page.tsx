@@ -12,6 +12,14 @@ export const revalidate = 60;
 
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=85";
 
+// BabyLoveGrowth articles open with an <h1> title and hero image that duplicate
+// this page's own hero banner — strip that lead-in before rendering the body.
+function stripDuplicateLead(html: string): string {
+  return html
+    .replace(/^\s*<h1[^>]*>[\s\S]*?<\/h1>\s*/i, "")
+    .replace(/^\s*<p>\s*<img[^>]*>\s*<\/p>\s*/i, "");
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -92,7 +100,7 @@ export default async function BlogPostPage({
                 )}
                 <div
                   className="prose prose-lg max-w-none text-gray-700 prose-headings:text-[#0F1F3D] prose-a:text-[#FF6B35]"
-                  dangerouslySetInnerHTML={{ __html: post.content_html }}
+                  dangerouslySetInnerHTML={{ __html: stripDuplicateLead(post.content_html) }}
                 />
                 <TagFooter tags={post.keywords ?? []} />
               </article>
