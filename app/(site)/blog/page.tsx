@@ -32,9 +32,6 @@ export default async function BlogPage() {
   const { isEnabled: preview } = await draftMode();
   const posts = await getMergedPosts(preview);
 
-  // Derive category chips from posts' tags
-  const categories = ["All", ...Array.from(new Set(posts.flatMap((p) => p.tags)))];
-
   // Posts are already sorted newest first
   const featured = posts[0] ?? null;
   const rest = posts.slice(1);
@@ -54,22 +51,6 @@ export default async function BlogPage() {
 
       <section className="py-16 bg-[#F7F8FC]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Categories */}
-          <div className="flex flex-wrap gap-2 mb-10">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  cat === "All"
-                    ? "bg-[#1B3A6B] text-white"
-                    : "bg-white text-gray-600 hover:bg-[#EBF0FA] hover:text-[#1B3A6B] border border-gray-200"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
           {/* Featured post */}
           {featured && (
             <Link

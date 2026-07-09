@@ -53,7 +53,9 @@ function normalizeBlg(article: BlogArticleSummary): NormalizedPostSummary {
     excerpt: article.excerpt,
     imageUrl: article.hero_image_url || FALLBACK_IMAGE,
     publishedAt: article.created_at,
-    tags: article.keywords ?? [],
+    // article.keywords is BLG's internal SEO keyword-targeting list,
+    // not editorial tags — never surface it in the UI.
+    tags: [],
     source: "blg",
   };
 }

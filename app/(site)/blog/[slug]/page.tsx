@@ -75,7 +75,8 @@ export default async function BlogPostPage({
   if (resolved.source === "blg") {
     const post = resolved.data;
     const imageUrl = post.hero_image_url || FALLBACK_IMAGE;
-    const category = post.keywords?.[0] ?? null;
+    // post.keywords is BLG's SEO targeting list — too spammy for the hero pill.
+    const category = null;
     const publishedAt = post.created_at
       ? new Date(post.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
       : null;
