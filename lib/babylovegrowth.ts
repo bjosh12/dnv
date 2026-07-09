@@ -26,23 +26,23 @@ function authHeaders() {
   return { "X-API-Key": API_KEY ?? "", "Content-Type": "application/json" };
 }
 
-export async function fetchArticles(limit = 50, offset = 0): Promise<BlogArticleSummary[]> {
+export async function fetchArticles(limit = 50, offset = 0, fresh = false): Promise<BlogArticleSummary[]> {
   if (!API_KEY) return [];
   const res = await fetch(`${BASE_URL}/v1/articles?limit=${limit}&offset=${offset}`, {
     headers: authHeaders(),
-    next: { revalidate: 3600 },
+    ...(fresh ? { cache: "no-store" as const } : { next: { revalidate: 300 } }),
   });
   if (!res.ok) return [];
   return res.json();
 }
 
 // The list endpoint is the only way to resolve a slug — there's no by-slug lookup.
-export async function fetchAllArticles(): Promise<BlogArticleSummary[]> {
+export async function fetchAllArticles(fresh = false): Promise<BlogArticleSummary[]> {
   const all: BlogArticleSummary[] = [];
   const limit = 50;
   let offset = 0;
   while (true) {
-    const page = await fetchArticles(limit, offset);
+    const page = await fetchArticles(limit, offset, fresh);
     if (page.length === 0) break;
     all.push(...page);
     if (page.length < limit) break;
@@ -62,8 +62,14 @@ export async function fetchArticleById(id: number): Promise<BlogArticle | null> 
 }
 
 export async function fetchArticleBySlug(slug: string): Promise<BlogArticle | null> {
-  const all = await fetchAllArticles();
-  const match = all.find((a) => a.slug === slug);
+  let all = await fetchAllArticles();
+  let match = all.find((a) => a.slug === slug);
+  if (!match) {
+    // Cached list may not include just-published articles yet — retry
+    // uncached before concluding the slug doesn't exist.
+    all = await fetchAllArticles(true);
+    match = all.find((a) => a.slug === slug);
+  }
   if (!match) return null;
   return fetchArticleById(match.id);
 }
