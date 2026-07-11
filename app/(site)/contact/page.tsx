@@ -5,6 +5,9 @@ import { useState } from "react";
 import { Mail, MessageSquare, Clock, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { CONTACT_EMAIL } from "@/lib/constants";
+import TurnstileWidget from "@/components/ui/TurnstileWidget";
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 const visaOptions = [
   "Digital Nomad Visa (DNV)",
@@ -22,6 +25,9 @@ export default function ContactPage() {
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  // Bumped on failed submits to remount the widget — Turnstile tokens are single-use
+  const [widgetKey, setWidgetKey] = useState(0);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -32,20 +38,31 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
+    const honeypot = (e.currentTarget as HTMLFormElement).elements.namedItem(
+      "website"
+    ) as HTMLInputElement | null;
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          website: honeypot?.value ?? "",
+          turnstileToken,
+        }),
       });
       if (res.ok) {
         setStatus("success");
         setForm({ name: "", email: "", phone: "", visa: "", message: "" });
       } else {
         setStatus("error");
+        setTurnstileToken("");
+        setWidgetKey((k) => k + 1);
       }
     } catch {
       setStatus("error");
+      setTurnstileToken("");
+      setWidgetKey((k) => k + 1);
     }
   };
 
@@ -141,6 +158,15 @@ export default function ContactPage() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Honeypot — hidden from real users, bots auto-fill it */}
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      className="absolute -left-[9999px] h-0 w-0 opacity-0"
+                    />
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-semibold text-gray-700 mb-1.5">
@@ -222,6 +248,14 @@ export default function ContactPage() {
                       />
                     </div>
 
+                    {TURNSTILE_SITE_KEY && (
+                      <TurnstileWidget
+                        key={widgetKey}
+                        siteKey={TURNSTILE_SITE_KEY}
+                        onToken={setTurnstileToken}
+                      />
+                    )}
+
                     {status === "error" && (
                       <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
                         Something went wrong. Please try again or email us directly at{" "}
@@ -233,7 +267,10 @@ export default function ContactPage() {
 
                     <button
                       type="submit"
-                      disabled={status === "loading"}
+                      disabled={
+                        status === "loading" ||
+                        (!!TURNSTILE_SITE_KEY && !turnstileToken)
+                      }
                       className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#FF6B35] text-white font-semibold text-sm hover:bg-[#E85520] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       {status === "loading" ? "Sending..." : "Send Message"}
