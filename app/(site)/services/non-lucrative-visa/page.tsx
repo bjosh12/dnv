@@ -73,9 +73,30 @@ export default async function NonLucrativeVisaPage() {
   ];
   const heroHeadline = sanity?.heroHeadline ?? "Spain's Non-Lucrative Visa";
   const heroBody = sanity?.heroBody ?? "Live the good life in Spain without working. The Non-Lucrative Visa is the classic route for retirees, passive income earners, and anyone financially independent.";
-  const pricingFrom = sanity?.pricingFrom ?? "€1,299";
-  const pricingNote = sanity?.pricingNote ?? "Full end-to-end service. Government fees extra.";
-  const pricingIncludes = sanity?.pricingIncludes?.length ? sanity.pricingIncludes : ["Personalised document checklist", "Income verification guidance", "Document translation coordination", "Application preparation & review", "Consulate appointment support"];
+  const pricingNote = sanity?.pricingNote ?? "No hidden fees. Pay in 3 easy installments.";
+  const pricingPackages = sanity?.pricingPackages?.length ? sanity.pricingPackages : [
+    {
+      name: "Standard Package",
+      price: "€950",
+      description: "For the independent nomad beginning their journey with foundational support.",
+      features: ["List of required documents for the visa", "Personalized application review", "Assistance in scheduling visa and NIE appointments", "Submission of application if applying in Spain", "Unlimited email support"],
+      popular: false,
+    },
+    {
+      name: "Standard Plus Package",
+      price: "€1,500",
+      description: "For nomads who want to save on translation costs.",
+      features: ["Everything in the Standard Package", "Translations of all your documents into Spanish (by a sworn and accredited translator)", "Assistance in scheduling TIE appointments"],
+      popular: true,
+    },
+  ];
+  const addOns = sanity?.addOns?.length ? sanity.addOns : [
+    { name: "Appointments", price: "€100/appointment", description: "Assistance for NIE, TIE, and Regreso appointments and forms." },
+    { name: "Apostilles", price: "TBD", description: "Get your documents from the US, Canada, and Australia apostilled." },
+    { name: "Translations", price: "€30/page", description: "Get your documents translated by a sworn Spanish translator." },
+  ];
+  const dependentFeeNote = sanity?.dependentFeeNote ?? "€500 per additional dependent";
+  const pricingFrom = pricingPackages[0]?.price ?? "€950";
 
   const serviceSchema = {
     "@context": "https://schema.org",
@@ -240,19 +261,62 @@ export default async function NonLucrativeVisaPage() {
                 </Link>
               </div>
 
-              <div className="border border-gray-200 rounded-2xl p-6">
-                <h3 className="font-bold text-[#0F1F3D] mb-2">Our Fee</h3>
-                <div className="text-3xl font-bold text-[#FF6B35] mb-1">From {pricingFrom}</div>
-                <p className="text-xs text-gray-500 mb-4">{pricingNote}</p>
-                <ul className="space-y-2 text-xs text-gray-600">
-                  {pricingIncludes.map((item: string) => (
-                    <li key={item} className="flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-[#FF6B35]" />
-                      {item}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="py-20 bg-[#F7F8FC]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-[#0F1F3D] mb-2">{pricingNote}</h2>
+            <p className="text-gray-500 text-sm">Government fees extra. {dependentFeeNote} regardless of package.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto mb-12">
+            {pricingPackages.map((pkg: { name: string; price: string; description: string; features: string[]; popular?: boolean }) => (
+              <div
+                key={pkg.name}
+                className={`relative rounded-2xl p-8 ${pkg.popular ? "bg-[#0F1F3D] text-white" : "bg-white border border-gray-200"}`}
+              >
+                {pkg.popular && (
+                  <div className="absolute -top-3 left-6 bg-[#FF6B35] text-white text-xs font-bold px-3 py-1 rounded-full">
+                    Popular
+                  </div>
+                )}
+                <h3 className={`text-lg font-semibold mb-2 ${pkg.popular ? "text-white" : "text-[#0F1F3D]"}`}>{pkg.name}</h3>
+                <div className={`text-4xl font-bold mb-3 ${pkg.popular ? "text-white" : "text-[#FF6B35]"}`}>{pkg.price}</div>
+                <p className={`text-sm mb-6 ${pkg.popular ? "text-gray-300" : "text-gray-500"}`}>{pkg.description}</p>
+                <ul className="space-y-3 mb-6">
+                  {pkg.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm">
+                      <Check className={`w-4 h-4 shrink-0 mt-0.5 ${pkg.popular ? "text-gray-300" : "text-[#FF6B35]"}`} />
+                      <span className={pkg.popular ? "text-white" : "text-gray-700"}>{f}</span>
                     </li>
                   ))}
                 </ul>
+                <Link
+                  href="/book"
+                  className={`block text-center px-4 py-3 rounded-xl font-semibold text-sm transition-colors ${
+                    pkg.popular ? "bg-[#FF6B35] text-white hover:bg-[#E85520]" : "bg-[#0F1F3D] text-white hover:bg-black"
+                  }`}
+                >
+                  Choose {pkg.name.replace(" Package", "")}
+                </Link>
               </div>
+            ))}
+          </div>
+
+          <div>
+            <h3 className="text-center text-sm font-semibold text-gray-500 uppercase tracking-wide mb-6">Additional Services</h3>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {addOns.map((addOn: { name: string; price: string; description: string }) => (
+                <div key={addOn.name} className="bg-white border border-gray-200 rounded-2xl p-5 text-center">
+                  <h4 className="font-semibold text-[#0F1F3D] mb-1">{addOn.name}</h4>
+                  <div className="text-[#FF6B35] font-bold text-sm mb-2">{addOn.price}</div>
+                  <p className="text-xs text-gray-500 leading-relaxed">{addOn.description}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>

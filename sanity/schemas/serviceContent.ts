@@ -57,9 +57,42 @@ export default defineType({
         },
       ],
     }),
-    defineField({ name: "pricingFrom", title: "Pricing (from)", type: "string", description: 'e.g. "€1,499"' }),
-    defineField({ name: "pricingNote", title: "Pricing Note", type: "string" }),
-    defineField({ name: "pricingIncludes", title: "Pricing Includes (bullet list)", type: "array", of: [{ type: "string" }] }),
+    defineField({ name: "pricingNote", title: "Pricing Note", type: "string", description: 'e.g. "No hidden fees. Pay in 3 easy installments."' }),
+    defineField({
+      name: "pricingPackages",
+      title: "Pricing Packages",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({ name: "name", title: "Package Name", type: "string" }),
+            defineField({ name: "price", title: "Price", type: "string", description: 'e.g. "€950"' }),
+            defineField({ name: "description", title: "Description", type: "string" }),
+            defineField({ name: "features", title: "Features", type: "array", of: [{ type: "string" }] }),
+            defineField({ name: "popular", title: "Popular?", type: "boolean" }),
+          ],
+          preview: { select: { title: "name", subtitle: "price" } },
+        },
+      ],
+    }),
+    defineField({
+      name: "addOns",
+      title: "Additional Services (Add-ons)",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({ name: "name", title: "Name", type: "string" }),
+            defineField({ name: "price", title: "Price", type: "string", description: 'e.g. "€30/page" or "TBD"' }),
+            defineField({ name: "description", title: "Description", type: "string" }),
+          ],
+          preview: { select: { title: "name", subtitle: "price" } },
+        },
+      ],
+    }),
+    defineField({ name: "dependentFeeNote", title: "Additional Dependent Fee Note", type: "string", description: 'e.g. "€500 per additional dependent"' }),
     defineField({
       name: "quickFacts",
       title: "Quick Facts (sidebar)",

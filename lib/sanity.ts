@@ -121,7 +121,7 @@ export async function getServiceContent(slug: string, preview = false) {
     `*[_type == "serviceContent" && slug == $slug][0] {
       slug, heroHeadline, heroBody,
       requirements, documents, faqs,
-      pricingFrom, pricingNote, pricingIncludes,
+      pricingNote, pricingPackages, addOns, dependentFeeNote,
       quickFacts,
       seo { title, description, "imageUrl": image.asset->url, noIndex }
     }`,
