@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -12,8 +12,12 @@ import {
   Check,
   Search,
   X,
+  Mail,
+  Loader2,
 } from "lucide-react";
-import { BOOKING_URL } from "@/lib/constants";
+import TurnstileWidget from "@/components/ui/TurnstileWidget";
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -723,6 +727,26 @@ function CountrySearchInput({
   );
 }
 
+// ─── Answer labelling (for submission) ───────────────────────────────────────
+
+// Convert raw answer values into readable question/answer pairs the server
+// (and the AI analysis) can use without knowing the wizard's internal ids.
+function labelAnswers(answers: Answers) {
+  const entries: { questionId: string; question: string; answer: string }[] = [];
+  for (const step of steps) {
+    const raw = answers[step.id];
+    if (raw === undefined) continue;
+    let answer: string;
+    if (Array.isArray(raw)) {
+      answer = raw.join(", ");
+    } else {
+      answer = step.options.find((o) => o.value === raw)?.label ?? raw;
+    }
+    entries.push({ questionId: step.id, question: step.question, answer });
+  }
+  return entries;
+}
+
 // ─── Main component ──────────────────────────────────────────────────────────
 
 export default function EligibilityChecker() {
@@ -731,6 +755,43 @@ export default function EligibilityChecker() {
   const [multiSelection, setMultiSelection] = useState<string[]>([]);
   const [result, setResult] = useState<Result | null>(null);
   const [countrySearch, setCountrySearch] = useState("");
+
+  // Contact gate (shown when a result is ready, before the full breakdown)
+  const [contact, setContact] = useState({ name: "", email: "", phone: "" });
+  const [submitState, setSubmitState] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [widgetKey, setWidgetKey] = useState(0);
+  const honeypotRef = useRef<HTMLInputElement>(null);
+  const onToken = useCallback((token: string) => setTurnstileToken(token), []);
+
+  async function handleContactSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!result || submitState === "submitting") return;
+    setSubmitState("submitting");
+    try {
+      const res = await fetch("/api/prequalify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: contact.name,
+          email: contact.email,
+          phone: contact.phone,
+          answers: labelAnswers(answers),
+          result: { status: result.status, flags: result.flags ?? [] },
+          website: honeypotRef.current?.value ?? "",
+          turnstileToken,
+        }),
+      });
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+      setSubmitState("success");
+    } catch (err) {
+      console.error("Pre-qualification submit failed:", err);
+      setSubmitState("error");
+      // Turnstile tokens are single-use — re-render the widget for the retry
+      setTurnstileToken("");
+      setWidgetKey((k) => k + 1);
+    }
+  }
 
   const visibleSteps = steps;
   const totalSteps = visibleSteps.length;
@@ -786,6 +847,9 @@ export default function EligibilityChecker() {
       setResult(null);
       setMultiSelection([]);
       setCountrySearch("");
+      setSubmitState("idle");
+      setTurnstileToken("");
+      setWidgetKey((k) => k + 1);
     } else if (stepIndex > 0) {
       setStepIndex(stepIndex - 1);
       setMultiSelection([]);
@@ -799,6 +863,10 @@ export default function EligibilityChecker() {
     setStepIndex(0);
     setMultiSelection([]);
     setCountrySearch("");
+    setContact({ name: "", email: "", phone: "" });
+    setSubmitState("idle");
+    setTurnstileToken("");
+    setWidgetKey((k) => k + 1);
   }
 
   const cfg = result ? statusConfig[result.status] : null;
@@ -950,9 +1018,124 @@ export default function EligibilityChecker() {
               </div>
             )}
           </>
+        ) : submitState !== "success" ? (
+          /* ── Contact gate: unlock full results by email ──────────────────── */
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${cfg!.badge}`}>
+                {result.label}
+              </span>
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#1B3A6B] transition-colors"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back
+              </button>
+            </div>
+
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-[#EBF0FA] flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-7 h-7 text-[#1B3A6B]" />
+              </div>
+              <h3 className="text-xl font-bold text-[#0F1F3D] mb-2">
+                Your assessment is ready
+              </h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Tell us where to send your personalized results — you&apos;ll see the full
+                breakdown here right away, plus a detailed copy in your inbox.
+              </p>
+            </div>
+
+            <form onSubmit={handleContactSubmit} className="space-y-3">
+              {/* Honeypot — hidden field real users never fill */}
+              <input
+                ref={honeypotRef}
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                className="hidden"
+                aria-hidden="true"
+              />
+
+              <input
+                type="text"
+                required
+                placeholder="Your name *"
+                value={contact.name}
+                onChange={(e) => setContact({ ...contact, name: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#1B3A6B] outline-none text-sm text-gray-700 transition-colors"
+              />
+              <input
+                type="email"
+                required
+                placeholder="Your email *"
+                value={contact.email}
+                onChange={(e) => setContact({ ...contact, email: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#1B3A6B] outline-none text-sm text-gray-700 transition-colors"
+              />
+              <input
+                type="tel"
+                placeholder="Phone / WhatsApp (optional)"
+                value={contact.phone}
+                onChange={(e) => setContact({ ...contact, phone: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#1B3A6B] outline-none text-sm text-gray-700 transition-colors"
+              />
+
+              {TURNSTILE_SITE_KEY && (
+                <TurnstileWidget
+                  key={widgetKey}
+                  siteKey={TURNSTILE_SITE_KEY}
+                  onToken={onToken}
+                />
+              )}
+
+              {submitState === "error" && (
+                <p className="text-xs text-red-600">
+                  Something went wrong sending your results. Please try again — your
+                  answers are safe.
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={
+                  submitState === "submitting" ||
+                  (!!TURNSTILE_SITE_KEY && !turnstileToken)
+                }
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#FF6B35] text-white font-semibold text-sm hover:bg-[#E85520] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {submitState === "submitting" ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Preparing your results…
+                  </>
+                ) : (
+                  <>
+                    See My Full Results
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              <p className="text-[11px] text-gray-400 text-center leading-relaxed">
+                We&apos;ll email your assessment and may follow up about your case. No
+                spam — see our{" "}
+                <Link href="/privacy" className="underline hover:text-[#1B3A6B]">
+                  privacy policy
+                </Link>
+                .
+              </p>
+            </form>
+          </div>
         ) : (
           /* ── Result ──────────────────────────────────────────────────────── */
           <div>
+            <p className="text-xs text-gray-500 mb-4 flex items-center gap-1.5">
+              <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+              A detailed copy is on its way to {contact.email || "your inbox"}.
+            </p>
             <div className={`rounded-2xl ${cfg!.bg} ${cfg!.border} border p-5 mb-5`}>
               <div className="flex items-start gap-3">
                 {StatusIcon && (
