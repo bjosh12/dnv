@@ -1,13 +1,13 @@
 # SEO Action Plan — digitalnomadinspain.com
 
-Derived from `FULL-AUDIT-REPORT.md`. Ordered by execution priority: immediate blockers → quick wins → strategic improvements. All fixes below are scoped to source files already identified — no live-site access is required to implement any of them.
+Derived from `FULL-AUDIT-REPORT.md`. Ordered by execution priority: immediate blockers → quick wins → strategic improvements. All fixes below are scoped to source files already identified. **Update:** live production access (via the Vercel MCP fetch tool) confirmed several of these findings directly against `https://www.digitalnomadinspain.com` and surfaced two new items (1.3 and 2.5 below).
 
 ---
 
 ## 1. Immediate Blockers (Critical)
 
 ### 1.1 Give `/contact` real metadata
-- **Why:** It currently has none — Google sees the homepage's title/description on this page too (`app/(site)/contact/page.tsx` is `"use client"` with no `metadata` export).
+- **Why:** It currently has none — Google sees the homepage's title/description on this page too (`app/(site)/contact/page.tsx` is `"use client"` with no `metadata` export). **Confirmed live**: the production `<title>`/description on `/contact` are byte-identical to the homepage's, and the page is listed in the live `sitemap.xml`, so this is an active duplicate-content issue, not just a theoretical one.
 - **Fix:**
   1. Rename the current file's body to a new client component, e.g. `components/contact/ContactForm.tsx`.
   2. Make `app/(site)/contact/page.tsx` a plain Server Component that:
@@ -42,6 +42,11 @@ Derived from `FULL-AUDIT-REPORT.md`. Ordered by execution priority: immediate bl
   3. Set explicit `width`/`height` (or `fill` with a sized wrapper, which these components already have via fixed-height containers) to preserve CLS protection.
 - **Effort:** Medium | **Classification:** Quick win (high impact, low-medium effort)
 
+### 1.3 Fix inconsistent blog-post structured data (new — confirmed live)
+- **Why:** Live-checking two blog posts showed `/blog/tie-fingerprinting-appointment-spain` (Sanity-authored) correctly ships `BlogPosting` JSON-LD, but `/blog/spanish-administration` (BabyLoveGrowth-sourced) has **no article schema at all** anywhere in its rendered HTML. The BLG branch in `app/(site)/blog/[slug]/page.tsx:86-91` only renders `post.jsonLd`/`post.faqJsonLd` if the upstream API happened to provide them — there's no fallback the way the Sanity branch's `articleSchema` object (lines 138-159) always constructs one.
+- **Fix:** In the BLG branch, construct a fallback `BlogPosting` object (headline from `post.title`, description from `post.meta_description`, image from `post.hero_image_url`, `datePublished`/`dateModified` from `post.created_at`, `url` from the current path) and render it whenever `post.jsonLd` is absent, mirroring the Sanity branch's pattern.
+- **Effort:** Low-Medium | **Classification:** Quick win
+
 ---
 
 ## 2. Quick Wins (Warning-level, low effort)
@@ -75,6 +80,24 @@ title: "About Us — Spain Visa Experts | Digital Nomad In Spain",
 
 ### 2.4 Differentiate the pricing/add-on boilerplate between the two service pages
 Rewrite the `pricingPackages`/`addOns` fallback copy in `services/non-lucrative-visa/page.tsx` so it isn't byte-identical to `services/digital-nomad-visa/page.tsx` — vary the framing/features language to reflect the different visa (e.g. NLV has no work-related paperwork, so "Assistance in scheduling visa and NIE appointments" language should reflect that).
+
+### 2.5 Add `/services` to the sitemap (new — confirmed live)
+`app/sitemap.ts:9-19`'s `STATIC_PATHS` array is missing `"/services"` — confirmed absent from the live `sitemap.xml` too, even though both child service pages are present. Add it:
+```ts
+const STATIC_PATHS = [
+  "/",
+  "/services",
+  "/services/digital-nomad-visa",
+  ...
+```
+
+### 2.6 Fix the `BlogPosting.headline` / `<title>` mismatch on SEO-overridden posts (new — confirmed live)
+Live-checking `/blog/tie-fingerprinting-appointment-spain` showed the schema `headline` ("How to Get a TIE Fingerprinting Appointment in Spain (2026 Guide)") doesn't match the rendered `<title>` ("How to Book a TIE Fingerprinting Appointment in Spain"), because `app/(site)/blog/[slug]/page.tsx:141` builds `articleSchema.headline` from raw `post.title`, while `generateMetadata` (lines 46-62) correctly prefers `post.seo?.title` when set. Fix: build the schema from the same resolved title:
+```ts
+const resolvedTitle = post.seo?.title || post.title;
+// ...
+headline: resolvedTitle,
+```
 
 ---
 
