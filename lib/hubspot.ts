@@ -50,6 +50,18 @@ function splitName(fullName: string): { firstname: string; lastname: string } {
   return { firstname: parts[0] ?? fullName, lastname: parts.slice(1).join(" ") };
 }
 
+// The dropdown options in this HubSpot portal were created with capitalized
+// values ("Eligible", "Hot", ...), and HubSpot requires an exact match on the
+// stored option value — map our internal lowercase values onto them.
+const HUBSPOT_OPTION_VALUES: Record<string, string> = {
+  eligible: "Eligible",
+  likely: "Likely",
+  "not-eligible": "Not-eligible",
+  hot: "Hot",
+  warm: "Warm",
+  cold: "Cold",
+};
+
 async function upsertContact(
   client: Client,
   input: { name: string; email: string; phone: string; result: WizardResult; analysis: AiAnalysis | null }
@@ -59,12 +71,12 @@ async function upsertContact(
     email: input.email,
     firstname,
     lastname,
-    dnv_eligibility_result: input.result.status,
+    dnv_eligibility_result: HUBSPOT_OPTION_VALUES[input.result.status] ?? input.result.status,
   };
   if (input.phone) properties.phone = input.phone;
   if (input.analysis) {
     properties.dnv_lead_score = String(input.analysis.score);
-    properties.dnv_lead_tier = input.analysis.tier;
+    properties.dnv_lead_tier = HUBSPOT_OPTION_VALUES[input.analysis.tier] ?? input.analysis.tier;
     properties.dnv_ai_summary = input.analysis.summary;
   }
 
