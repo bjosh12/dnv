@@ -87,7 +87,7 @@ async function analyzeWithClaude(
 
   const response = await anthropic.messages.create({
     model: AI_MODEL,
-    max_tokens: 2048,
+    max_tokens: 8000,
     thinking: { type: "adaptive" },
     output_config: { format: { type: "json_schema", schema: ANALYSIS_SCHEMA } },
     system: `You are a lead-qualification analyst for ${SITE_NAME}, a consultancy helping people obtain Spain's Digital Nomad Visa (DNV) and Non-Lucrative Visa. The minimum income requirement for the DNV is €${DNV_INCOME_THRESHOLD}/month. You receive a prospect's answers from the eligibility questionnaire plus a rule-based verdict. Assess how valuable this lead is to the consultancy and how strong their visa case is. Score: 80-100 = hot (clear case, ready to convert), 50-79 = warm (viable with work), below 50 = cold (weak case or major blockers). Be direct and specific — the consultant reads this to decide whether to prioritize the lead.`,
@@ -101,11 +101,30 @@ async function analyzeWithClaude(
     ],
   });
 
-  if (response.stop_reason === "refusal") return null;
+  if (response.stop_reason === "refusal") {
+    console.error("AI analysis refused by safety classifier");
+    return null;
+  }
+  if (response.stop_reason === "max_tokens") {
+    console.error("AI analysis hit max_tokens before completing — response likely truncated");
+  }
   const textBlock = response.content.find((b) => b.type === "text");
-  if (!textBlock || textBlock.type !== "text") return null;
+  if (!textBlock || textBlock.type !== "text") {
+    console.error("AI analysis: no text block in response", { stop_reason: response.stop_reason });
+    return null;
+  }
 
-  const parsed = JSON.parse(textBlock.text) as AiAnalysis;
+  let parsed: AiAnalysis;
+  try {
+    parsed = JSON.parse(textBlock.text) as AiAnalysis;
+  } catch (err) {
+    console.error(
+      "AI analysis: failed to parse JSON",
+      { stop_reason: response.stop_reason, raw: textBlock.text.slice(0, 2000) },
+      err
+    );
+    return null;
+  }
   // Defensive clamp — the schema constrains shape, not ranges
   parsed.score = Math.max(0, Math.min(100, Math.round(parsed.score)));
   if (!["hot", "warm", "cold"].includes(parsed.tier)) {

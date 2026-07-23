@@ -4,6 +4,17 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title('Digital Nomad In Spain')
     .items([
+      // ── Leads (pre-qualification tool) ───────────────────────
+      S.listItem()
+        .title('Leads')
+        .child(
+          S.documentTypeList('leadProfile')
+            .title('Leads')
+            .defaultOrdering([{ field: 'submittedAt', direction: 'desc' }])
+        ),
+
+      S.divider(),
+
       // ── Singletons ──────────────────────────────────────────
       S.listItem()
         .title('Site Settings')
