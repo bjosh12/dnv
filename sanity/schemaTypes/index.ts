@@ -10,6 +10,7 @@ import teamMember from '../schemas/teamMember'
 import faqItem from '../schemas/faqItem'
 import serviceContent from '../schemas/serviceContent'
 import seoObject from '../schemas/seoObject'
+import leadProfile from '../schemas/leadProfile'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -28,5 +29,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     post,
     author,
     category,
+    // Leads (pre-qualification tool)
+    leadProfile,
   ],
 }

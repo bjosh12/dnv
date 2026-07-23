@@ -28,6 +28,13 @@ export function getClient(preview = false) {
   return preview ? previewClient : client;
 }
 
+// Server-only write client (lead profiles, mutations). Requires SANITY_WRITE_TOKEN.
+export const writeClient = createClient({
+  ...config,
+  useCdn: false,
+  token: process.env.SANITY_WRITE_TOKEN,
+});
+
 const builder = imageUrlBuilder(client);
 
 export function urlFor(source: Parameters<typeof builder.image>[0]) {
