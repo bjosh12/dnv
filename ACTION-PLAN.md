@@ -2,6 +2,8 @@
 
 Derived from `FULL-AUDIT-REPORT.md`. Ordered by execution priority: immediate blockers → quick wins → strategic improvements. All fixes below are scoped to source files already identified. **Update:** live production access (via the Vercel MCP fetch tool) confirmed several of these findings directly against `https://www.digitalnomadinspain.com` and surfaced two new items (1.3 and 2.5 below).
 
+**Status: items 1.1–1.3, 2.1–2.6, and 3.1/3.4 are implemented** (commit `1de7379` on `claude/seo-digitalnomadinspain-uwxnfw`, pushed). `npx tsc --noEmit` and `npm run lint` both pass with no new errors from these changes. A full `npm run build` couldn't complete in this sandbox — Next.js's static generation needs to reach Sanity's API (`wllgq317.apicdn.sanity.io`), which this environment's network policy blocks — but compilation and type-checking succeeded, and that same host is reachable from the actual Vercel build environment. Still open: 3.2 (full census of `faqJsonLd.@type` — a defensive guard against `FAQPage` was added, but the broader API audit wasn't run), 3.3 (needs a Sanity Studio schema change, not just app code), and 3.5 (left as-is; it's a documented trade-off, not a bug).
+
 ---
 
 ## 1. Immediate Blockers (Critical)
