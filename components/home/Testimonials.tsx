@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const DEFAULT_TESTIMONIALS = [
   {
     _id: "1",
@@ -75,7 +77,13 @@ export default function Testimonials({ data }: { data?: SanityTestimonial[] | nu
               <p className="text-gray-700 text-sm leading-relaxed mb-6">{t.quote}</p>
               <div className="flex items-center gap-3">
                 {t.avatarUrl && (
-                  <img src={t.avatarUrl} alt={t.name} className="w-11 h-11 rounded-full object-cover" />
+                  <Image
+                    src={t.avatarUrl}
+                    alt={t.name}
+                    width={44}
+                    height={44}
+                    className="w-11 h-11 rounded-full object-cover"
+                  />
                 )}
                 <div>
                   <p className="font-semibold text-[#0F1F3D] text-sm">{t.name}</p>

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, Laptop, Palmtree } from "lucide-react";
-import { BOOKING_URL } from "@/lib/constants";
+import { BOOKING_URL, SITE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Visa Services",
   description:
     "Expert assistance for Spain's Digital Nomad Visa and Non-Lucrative Visa. Compare both options and choose the right path for your move to Spain.",
+  alternates: { canonical: `${SITE_URL}/services` },
 };
 
 const services = [

@@ -8,6 +8,7 @@ export const revalidate = 3600;
 
 const STATIC_PATHS = [
   "/",
+  "/services",
   "/services/digital-nomad-visa",
   "/services/non-lucrative-visa",
   "/eligibility",

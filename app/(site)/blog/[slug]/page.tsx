@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { draftMode } from "next/headers";
 import { Calendar, ArrowLeft } from "lucide-react";
 import { PortableText } from "@portabletext/react";
 import { urlFor } from "@/lib/sanity";
 import { getPostBySlug } from "@/lib/blog";
 import { buildMetadata } from "@/lib/seo";
+import { SITE_URL, SITE_NAME } from "@/lib/constants";
 
 export const revalidate = 60;
 
@@ -18,6 +20,18 @@ function stripDuplicateLead(html: string): string {
   return html
     .replace(/^\s*<h1[^>]*>[\s\S]*?<\/h1>\s*/i, "")
     .replace(/^\s*<p>\s*<img[^>]*>\s*<\/p>\s*/i, "");
+}
+
+function buildBreadcrumbSchema(postTitle: string, slug: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
+      { "@type": "ListItem", position: 3, name: postTitle, item: `${SITE_URL}/blog/${slug}` },
+    ],
+  };
 }
 
 export async function generateMetadata({
@@ -81,14 +95,41 @@ export default async function BlogPostPage({
       ? new Date(post.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
       : null;
 
+    // BabyLoveGrowth doesn't always return jsonLd for an article — fall back to
+    // our own BlogPosting so every post ships structured data, not just some.
+    const fallbackArticleSchema = {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: post.title,
+      description: post.meta_description ?? post.excerpt ?? "",
+      image: imageUrl,
+      datePublished: post.created_at ?? undefined,
+      dateModified: post.created_at ?? undefined,
+      url: `${SITE_URL}/blog/${slug}`,
+      author: { "@type": "Person", name: SITE_NAME, url: `${SITE_URL}/about` },
+      publisher: {
+        "@type": "Organization",
+        name: SITE_NAME,
+        url: SITE_URL,
+        logo: { "@type": "ImageObject", url: `${SITE_URL}/icon.svg` },
+      },
+    };
+
     return (
       <>
-        {post.jsonLd && (
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(post.jsonLd) }} />
-        )}
-        {post.faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(post.jsonLd ?? fallbackArticleSchema) }}
+        />
+        {/* FAQPage rich results are restricted to gov/health sites — never emit
+            that type here, whatever the upstream API returns. */}
+        {post.faqJsonLd && post.faqJsonLd["@type"] !== "FAQPage" && (
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(post.faqJsonLd) }} />
         )}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbSchema(post.title, slug)) }}
+        />
         <BlogHero imageUrl={imageUrl} title={post.title} category={category} publishedAt={publishedAt} />
         <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -126,6 +167,7 @@ export default async function BlogPostPage({
     mainImage?: unknown;
     categories?: string[];
     author?: { name: string; image?: unknown };
+    seo?: { title?: string };
   };
   const post = resolved.data as SanityPost;
 
@@ -134,26 +176,29 @@ export default async function BlogPostPage({
   const publishedAt = post.publishedAt
     ? new Date(post.publishedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
     : null;
+  // Match the resolved <title> tag (buildMetadata prefers seo.title when set)
+  // so the schema headline never diverges from what's actually rendered.
+  const resolvedTitle = post.seo?.title || post.title;
 
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    headline: post.title,
+    headline: resolvedTitle,
     description: post.excerpt ?? "",
     image: imageUrl,
     datePublished: post.publishedAt ?? undefined,
     dateModified: post.publishedAt ?? undefined,
-    url: `https://www.digitalnomadinspain.com/blog/${slug}`,
+    url: `${SITE_URL}/blog/${slug}`,
     author: {
       "@type": "Person",
-      name: post.author?.name ?? "Digital Nomad In Spain",
-      url: "https://www.digitalnomadinspain.com/about",
+      name: post.author?.name ?? SITE_NAME,
+      url: `${SITE_URL}/about`,
     },
     publisher: {
       "@type": "Organization",
-      name: "Digital Nomad In Spain",
-      url: "https://www.digitalnomadinspain.com",
-      logo: { "@type": "ImageObject", url: "https://www.digitalnomadinspain.com/icon.svg" },
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/icon.svg` },
     },
     ...(post.categories?.length && { keywords: post.categories.join(", ") }),
   };
@@ -161,6 +206,10 @@ export default async function BlogPostPage({
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbSchema(resolvedTitle, slug)) }}
+      />
       <BlogHero imageUrl={imageUrl} title={post.title} category={category} publishedAt={publishedAt} />
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -225,7 +274,15 @@ function BlogHero({
 }) {
   return (
     <div className="relative h-72 sm:h-96 lg:h-[480px] overflow-hidden">
-      <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
+      <Image
+        src={imageUrl}
+        alt={title}
+        fill
+        preload
+        fetchPriority="high"
+        sizes="100vw"
+        className="object-cover"
+      />
       <div className="absolute inset-0 bg-gradient-to-t from-[#0F1F3D]/80 via-[#0F1F3D]/20 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
         <div className="max-w-4xl mx-auto">

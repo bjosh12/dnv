@@ -78,22 +78,22 @@ export default async function NonLucrativeVisaPage() {
     {
       name: "Standard Package",
       price: "€950",
-      description: "For the independent nomad beginning their journey with foundational support.",
+      description: "For retirees and passive-income applicants beginning their journey with foundational support.",
       features: ["List of required documents for the visa", "Personalized application review", "Assistance in scheduling visa and NIE appointments", "Submission of application if applying in Spain", "Unlimited email support"],
       popular: false,
     },
     {
       name: "Standard Plus Package",
       price: "€1,500",
-      description: "For nomads who want to save on translation costs.",
+      description: "For applicants who want to save on translation costs for proof-of-funds and pension documents.",
       features: ["Everything in the Standard Package", "Translations of all your documents into Spanish (by a sworn and accredited translator)", "Assistance in scheduling TIE appointments"],
       popular: true,
     },
   ];
   const addOns = sanity?.addOns?.length ? sanity.addOns : [
     { name: "Appointments", price: "€100/appointment", description: "Assistance for NIE, TIE, and Regreso appointments and forms." },
-    { name: "Apostilles", price: "TBD", description: "Get your documents from the US, Canada, and Australia apostilled." },
-    { name: "Translations", price: "€30/page", description: "Get your documents translated by a sworn Spanish translator." },
+    { name: "Apostilles", price: "TBD", description: "Get your pension, bank, and investment statements from the US, Canada, and Australia apostilled." },
+    { name: "Translations", price: "€30/page", description: "Get your proof-of-funds documents translated by a sworn Spanish translator." },
   ];
   const dependentFeeNote = sanity?.dependentFeeNote ?? "€500 per additional dependent";
   const pricingFrom = pricingPackages[0]?.price ?? "€950";
@@ -109,9 +109,20 @@ export default async function NonLucrativeVisaPage() {
     offers: { "@type": "Offer", price: pricingFrom.replace(/[€,]/g, ""), priceCurrency: "EUR", description: pricingNote },
   };
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.digitalnomadinspain.com" },
+      { "@type": "ListItem", position: 2, name: "Services", item: "https://www.digitalnomadinspain.com/services" },
+      { "@type": "ListItem", position: 3, name: "Non-Lucrative Visa", item: "https://www.digitalnomadinspain.com/services/non-lucrative-visa" },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {/* Hero */}
       <section className="relative pt-32 pb-20 overflow-hidden bg-[#0F1F3D]">
         <div className="absolute inset-0 opacity-10">

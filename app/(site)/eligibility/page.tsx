@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import EligibilityChecker from "@/components/eligibility/EligibilityChecker";
+import { SITE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Eligibility Checker",
   description:
     "Find out in 2 minutes whether you qualify for Spain's Digital Nomad Visa or Non-Lucrative Visa. Free personalized assessment sent to your email.",
+  alternates: { canonical: `${SITE_URL}/eligibility` },
 };
 
 export default function EligibilityPage() {

@@ -11,7 +11,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const aboutData = await getAboutPage().catch(() => null);
   return buildMetadata(aboutData?.seo, {
-    title: "About Us",
+    title: "About Us — Spain Visa Experts | Digital Nomad In Spain",
     description: "Meet the team behind Digital Nomad In Spain — visa experts who have helped 500+ people build their life in Spain.",
     path: "/about",
   });
