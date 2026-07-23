@@ -27,6 +27,17 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        // Old BabyLoveGrowth slug, since renamed — an internal link still
+        // points here per Ahrefs Site Audit (404, 1 inlink).
+        source: "/blog/top-4-expat-health-insurance-for-seniors-agencies-4",
+        destination: "/blog/expat-health-insurance-for-seniors-agencies-4",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
