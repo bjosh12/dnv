@@ -35,3 +35,7 @@ export const SOCIAL_LINKS = {
 
 export const DNV_INCOME_THRESHOLD = 2646; // EUR/month
 export const NLV_INCOME_THRESHOLD = 2400; // EUR/month
+
+// IndexNow key — not a secret, it only proves domain ownership by being
+// hosted at /{key}.txt. Also served as a static file at public/{key}.txt.
+export const INDEXNOW_KEY = "9048b3788f2cf28665af4676dc6e9e99";
