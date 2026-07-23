@@ -130,15 +130,18 @@ function buildNoteHtml(
   const rows = answers
     .map((a) => `<li><strong>${a.question}</strong> — ${a.answer}</li>`)
     .join("");
+  // HubSpot collapses long notes behind "Expand" — lead with the score/tier
+  // headline and summary so the triage-relevant part sits above the fold.
   const aiSection = analysis
-    ? `<p><strong>AI summary:</strong> ${analysis.summary}</p>
-       ${analysis.riskFlags.length ? `<p><strong>Risk flags:</strong></p><ul>${analysis.riskFlags.map((f) => `<li>${f}</li>`).join("")}</ul>` : ""}
+    ? `<p><strong>🤖 AI Analysis — ${analysis.tier.toUpperCase()} (score ${analysis.score}/100)</strong></p>
+       <p>${analysis.summary}</p>
+       ${analysis.riskFlags.length ? `<p><strong>Risks:</strong></p><ul>${analysis.riskFlags.map((f) => `<li>${f}</li>`).join("")}</ul>` : ""}
        ${analysis.nextSteps.length ? `<p><strong>Next steps:</strong></p><ol>${analysis.nextSteps.map((s) => `<li>${s}</li>`).join("")}</ol>` : ""}`
     : "<p>AI analysis unavailable for this lead.</p>";
 
   return `
-    <p><strong>Eligibility result:</strong> ${result.status}</p>
     ${aiSection}
+    <p><strong>Eligibility result:</strong> ${result.status}</p>
     <p><strong>Full questionnaire:</strong></p>
     <ul>${rows}</ul>
     <p><a href="${SITE_URL}/studio/structure/leadProfile;${leadId}">Open this lead in Sanity Studio</a></p>
