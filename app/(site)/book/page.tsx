@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import BookPageClient from "@/components/book/BookPageClient";
 import { getAboutPage } from "@/lib/sanity";
+import { SITE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Book a Consultation",
   description: "Schedule a free 45-minute visa consultation with our Spain immigration experts. Pick a time that works for you.",
+  alternates: { canonical: `${SITE_URL}/book` },
 };
 
 export const revalidate = 60;

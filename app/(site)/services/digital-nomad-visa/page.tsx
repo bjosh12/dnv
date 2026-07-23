@@ -110,9 +110,20 @@ export default async function DigitalNomadVisaPage() {
     offers: { "@type": "Offer", price: pricingFrom.replace(/[€,]/g, ""), priceCurrency: "EUR", description: pricingNote },
   };
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.digitalnomadinspain.com" },
+      { "@type": "ListItem", position: 2, name: "Services", item: "https://www.digitalnomadinspain.com/services" },
+      { "@type": "ListItem", position: 3, name: "Digital Nomad Visa", item: "https://www.digitalnomadinspain.com/services/digital-nomad-visa" },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {/* Hero */}
       <section className="relative pt-32 pb-20 overflow-hidden bg-[#1B3A6B]">
         <div className="absolute inset-0 opacity-10">

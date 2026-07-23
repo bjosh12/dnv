@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Calendar } from "lucide-react";
 import type { NormalizedPostSummary } from "@/lib/blog";
 
@@ -82,10 +83,12 @@ export default function BlogPreview({ posts }: { posts?: NormalizedPostSummary[]
               className="group flex flex-col rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
             >
               <div className="relative h-44 overflow-hidden">
-                <img
+                <Image
                   src={post.imageUrl || FALLBACK_IMAGE}
                   alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 {post.tags[0] && (
                   <span className="absolute top-3 left-3 bg-[#1B3A6B] text-white text-xs font-medium px-2.5 py-1 rounded-full">

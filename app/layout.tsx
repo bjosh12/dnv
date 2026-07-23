@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
-import { SITE_NAME, SITE_TAGLINE, SITE_URL, CONTACT_EMAIL, WHATSAPP_NUMBER } from "@/lib/constants";
+import { SITE_NAME, SITE_TAGLINE, SITE_URL, CONTACT_EMAIL, WHATSAPP_NUMBER, SOCIAL_LINKS } from "@/lib/constants";
 import { Analytics } from '@vercel/analytics/next';
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans", display: "swap" });
@@ -76,7 +76,7 @@ const organizationSchema = {
     width: 512,
     height: 512,
   },
-  sameAs: [],
+  sameAs: Object.values(SOCIAL_LINKS),
 };
 
 const websiteSchema = {

@@ -4,6 +4,7 @@ import { SITE_NAME, CONTACT_EMAIL, SITE_URL } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Terms of Service",
   description: `Terms of service for ${SITE_NAME} visa consulting services.`,
+  alternates: { canonical: `${SITE_URL}/terms` },
 };
 
 export default function TermsPage() {
