@@ -142,8 +142,9 @@ const steps: StepDef[] = [
     id: "criminal",
     section: "Legal Eligibility",
     sectionNum: 1,
-    question:
-      "Over the last 2 years, across every country you've called home — do you have a clean criminal record?",
+    question: "Do you have a clean criminal record?",
+    subtext:
+      "This covers every country you've lived in during the last 2 years — Spain asks for a police certificate from each.",
     type: "single",
     options: [
       { label: "Yes, completely clear", value: "clean", icon: "✅" },
@@ -170,13 +171,14 @@ const steps: StepDef[] = [
     id: "remote_type",
     section: "Your Work Setup",
     sectionNum: 2,
-    question:
-      "Does your job ever require you to physically show up somewhere — an office, client site, or any other location?",
+    question: "Can you do your job 100% online?",
+    subtext:
+      "Think about whether you ever need to be physically present — an office, a client site, a store.",
     type: "single",
     options: [
-      { label: "Never — I work entirely online", value: "full", icon: "💻" },
-      { label: "Rarely, but it does happen occasionally", value: "mostly", icon: "⚠️" },
-      { label: "Yes, in-person presence is part of the role", value: "no", icon: "❌" },
+      { label: "Yes — my work is fully online", value: "full", icon: "💻" },
+      { label: "Mostly — I occasionally need to show up in person", value: "mostly", icon: "⚠️" },
+      { label: "No — in-person presence is part of my role", value: "no", icon: "❌" },
     ],
     earlyExit: (value) => {
       if (value === "no") {
@@ -185,7 +187,7 @@ const steps: StepDef[] = [
           label: "Not eligible for DNV",
           title: "The DNV requires fully remote work",
           message:
-            "Spain's Digital Nomad Visa is built around 100% telematic (online) work. If your role requires any physical presence at a fixed location, it doesn't meet the visa's core requirement — regardless of how infrequently that happens.",
+            "Spain's Digital Nomad Visa is built around work done 100% online. If your role requires any physical presence at a fixed location, it doesn't meet the visa's core requirement — regardless of how infrequently that happens.",
           next: "Get in touch and we can look at whether any other pathway fits your situation.",
         };
       }
@@ -226,7 +228,7 @@ const steps: StepDef[] = [
     section: "Employer & Client Details",
     sectionNum: 3,
     question:
-      "Has the company you work for — or your main client, if you freelance — been a registered legal entity for at least one year?",
+      "Has your employer (or main client) been officially registered as a company for at least 1 year?",
     type: "single",
     options: [
       { label: "Yes, they've been established for over a year", value: "yes", icon: "✅" },
@@ -239,7 +241,7 @@ const steps: StepDef[] = [
     section: "Employer & Client Details",
     sectionNum: 3,
     question:
-      "Does your employer — or main client — have any legal footprint in Spain? Think branches, subsidiaries, registered offices, or any kind of Spanish entity.",
+      "Does your employer (or main client) have a company, branch, or office in Spain?",
     type: "single",
     options: [
       { label: "No, they operate exclusively outside Spain", value: "no", icon: "✅" },
@@ -252,7 +254,7 @@ const steps: StepDef[] = [
     section: "Employer & Client Details",
     sectionNum: 3,
     question:
-      "Would your employer (or main client) be willing to put their name to a letter confirming you're authorised to work from Spain?",
+      "Would your employer (or main client) sign a letter confirming you're allowed to work remotely from Spain?",
     type: "single",
     options: [
       { label: "Yes, they'd have no issue with that", value: "yes", icon: "✅" },
@@ -267,8 +269,9 @@ const steps: StepDef[] = [
     id: "qualifications",
     section: "Qualifications",
     sectionNum: 4,
-    question:
-      "Do you hold a university degree in your field? Or if not, can you back up 3 years of professional experience with official paperwork — tax returns, social security records, that sort of thing?",
+    question: "Which of these best describes your qualifications?",
+    subtext:
+      "Spain asks for either a university degree in your field, or 3+ years of experience you can prove with documents (tax returns, contracts, social security records).",
     type: "single",
     options: [
       { label: "Yes — I have a relevant degree", value: "degree", icon: "🎓" },
@@ -390,11 +393,21 @@ const steps: StepDef[] = [
     id: "submission_location",
     section: "Travel & Documents",
     sectionNum: 6,
-    question: "Where are you planning to hand in your application?",
+    question: "Where are you planning to submit your application?",
     type: "single",
     options: [
-      { label: "At the Spanish consulate in my country of residence", value: "consulate", icon: "🏛️" },
-      { label: "I'm already in Spain", value: "in-spain", icon: "🇪🇸", sublabel: "Different route applies" },
+      {
+        label: "At the Spanish consulate in the country where I live",
+        value: "consulate",
+        icon: "🏛️",
+        sublabel: "Grants a 1-year visa to start",
+      },
+      {
+        label: "From within Spain — I'm already here, or willing to travel there to apply",
+        value: "in-spain",
+        icon: "🇪🇸",
+        sublabel: "Up to 3 years of residency if approved",
+      },
       { label: "Still figuring this out", value: "unsure", icon: "🤔" },
     ],
   },
@@ -403,7 +416,7 @@ const steps: StepDef[] = [
     section: "Travel & Documents",
     sectionNum: 6,
     question:
-      "If your passport requires a Schengen visa to travel in Europe, can you obtain one before heading to Spain?",
+      "Some passports need a Schengen visa just to enter Spain. If yours does, could you get one?",
     type: "single",
     options: [
       { label: "Yes, I can apply for a Schengen visa", value: "yes", icon: "✅" },
@@ -468,7 +481,7 @@ function computeResult(answers: Answers): Result {
 
   // Employer letter
   if (answers.employer_letter === "no") {
-    flags.push("Employer unwilling to provide an authorisation letter — this is a significant obstacle");
+    flags.push("Employer unwilling to provide an authorisation letter — a real obstacle, but often solvable once the employer understands what the letter actually commits them to; we can help you make that case");
   }
   if (answers.employer_letter === "not-asked") {
     flags.push("Haven't raised the authorisation letter with your employer yet — this conversation needs to happen early");
@@ -481,7 +494,7 @@ function computeResult(answers: Answers): Result {
 
   // Payment method
   if (answers.payment_method === "platform") {
-    flags.push("Payment via online platforms only — consulates require clear evidence of regular, traceable income; platform screenshots alone often aren't enough");
+    flags.push("Income received via platforms (Stripe, PayPal, Wise, Payoneer) — completely workable: we'll match your platform payouts to the bank statements where the money lands, so the consulate sees one clear, traceable income trail");
   }
 
   // Schengen
@@ -494,7 +507,7 @@ function computeResult(answers: Answers): Result {
 
   // Submission location
   if (answers.submission_location === "in-spain") {
-    flags.push("Already in Spain — the process differs from applying at a consulate; confirm which route applies to your situation");
+    flags.push("Applying from within Spain — this route can grant up to 3 years of residency at once; we'll confirm you meet the entry and stay conditions to use it");
   }
 
   // Result
