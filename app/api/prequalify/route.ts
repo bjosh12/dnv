@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import Anthropic from "@anthropic-ai/sdk";
 import { writeClient } from "@/lib/sanity";
+import { syncLeadToHubspot } from "@/lib/hubspot";
 import {
   CONTACT_EMAIL,
   SITE_NAME,
@@ -14,9 +15,9 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const AI_MODEL = "claude-opus-4-8";
 
-type AnswerEntry = { questionId: string; question: string; answer: string };
-type WizardResult = { status: "eligible" | "likely" | "not-eligible"; flags: string[] };
-type AiAnalysis = {
+export type AnswerEntry = { questionId: string; question: string; answer: string };
+export type WizardResult = { status: "eligible" | "likely" | "not-eligible"; flags: string[] };
+export type AiAnalysis = {
   score: number;
   tier: "hot" | "warm" | "cold";
   summary: string;
@@ -140,7 +141,8 @@ function consultantEmailHtml(
   result: WizardResult,
   answers: AnswerEntry[],
   analysis: AiAnalysis | null,
-  leadId: string
+  leadId: string,
+  hubspotContactUrl?: string
 ) {
   const studioUrl = `${SITE_URL}/studio/structure/leadProfile;${leadId}`;
   const answersRows = answers
@@ -168,6 +170,7 @@ function consultantEmailHtml(
     </p>
     ${aiSection}
     <p><a href="${studioUrl}">Open this lead in Sanity Studio →</a></p>
+    ${hubspotContactUrl ? `<p><a href="${hubspotContactUrl}">Open this lead in HubSpot →</a></p>` : ""}
     <h3>Full questionnaire</h3>
     <table style="border-collapse:collapse;font-size:13px;">${answersRows}</table>
     <hr>
@@ -286,7 +289,36 @@ export async function POST(req: Request) {
       }
     }
 
-    // 3. Emails — log failures but don't fail the request; the lead is saved
+    // 3. HubSpot sync — best-effort, must not block emails or fail the request
+    let hubspotContactUrl: string | undefined;
+    if (process.env.HUBSPOT_ACCESS_TOKEN) {
+      try {
+        const hubspotResult = await syncLeadToHubspot({
+          leadId: lead._id,
+          name: String(name),
+          email: String(email),
+          phone: phone ? String(phone) : "",
+          answers: cleanAnswers,
+          result: cleanResult,
+          analysis,
+        });
+        if (hubspotResult?.contactUrl || hubspotResult?.dealUrl) {
+          hubspotContactUrl = hubspotResult.contactUrl;
+          await writeClient
+            .patch(lead._id)
+            .set({
+              hubspotContactUrl: hubspotResult.contactUrl,
+              hubspotDealUrl: hubspotResult.dealUrl,
+            })
+            .commit()
+            .catch((e) => console.error("Failed to patch HubSpot links onto lead:", e));
+        }
+      } catch (err) {
+        console.error("HubSpot sync failed:", err);
+      }
+    }
+
+    // 4. Emails — log failures but don't fail the request; the lead is saved
     try {
       await resend.emails.send({
         from: `${SITE_NAME} <noreply@digitalnomadinspain.com>`,
@@ -301,7 +333,8 @@ export async function POST(req: Request) {
           cleanResult,
           cleanAnswers,
           analysis,
-          lead._id
+          lead._id,
+          hubspotContactUrl
         ),
       });
 

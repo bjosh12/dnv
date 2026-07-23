@@ -50,6 +50,10 @@ export default defineType({
       of: [{ type: "string" }],
       readOnly: true,
     }),
+
+    // ── CRM sync (HubSpot) ───────────────────────────────────────────────────
+    defineField({ name: "hubspotContactUrl", title: "HubSpot Contact", type: "url", readOnly: true }),
+    defineField({ name: "hubspotDealUrl", title: "HubSpot Deal", type: "url", readOnly: true }),
     defineField({
       name: "answers",
       title: "Wizard Answers",
