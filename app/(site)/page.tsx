@@ -18,7 +18,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const homePage = await getHomePage().catch(() => null);
   return buildMetadata(homePage?.seo, {
-    title: "Spain Digital Nomad Visa Consultants | Digital Nomad In Spain",
+    title: "Spain Digital Nomad Visa Consultants – 98% Approval Rate",
     description: "Get your Spain Digital Nomad Visa approved with expert help. 98% approval rate, 500+ clients, end-to-end support. Book your free consultation today.",
     path: "/",
   });

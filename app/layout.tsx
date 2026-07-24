@@ -10,7 +10,7 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans", display
 
 export const metadata: Metadata = {
   title: {
-    default: `Spain Digital Nomad Visa Consultants | ${SITE_NAME}`,
+    default: `${SITE_NAME} | Spain Visa Consultants`,
     template: `%s | ${SITE_NAME}`,
   },
   description:
@@ -30,13 +30,13 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `Spain Digital Nomad Visa Consultants | ${SITE_NAME}`,
+    title: `${SITE_NAME} | Spain Visa Consultants`,
     description: SITE_TAGLINE,
     images: [{ url: `${SITE_URL}/opengraph-image`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Spain Digital Nomad Visa Consultants | ${SITE_NAME}`,
+    title: `${SITE_NAME} | Spain Visa Consultants`,
     description: SITE_TAGLINE,
   },
 };
