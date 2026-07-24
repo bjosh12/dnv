@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Expert guidance for Spain's Digital Nomad Visa and Non-Lucrative Visa. 98% approval rate, end-to-end support, 500+ approved clients.",
+    "Get your Spain Digital Nomad Visa approved with expert help. 98% approval rate, 500+ clients, end-to-end support. Book your free consultation today.",
   keywords: [
     "digital nomad visa spain",
     "spain non-lucrative visa",
