@@ -6,8 +6,8 @@ import { ArrowRight, CheckCircle } from "lucide-react";
 import { LakbyteAmbassadorBadge } from "@/components/ui/LakbyteBadge";
 
 const DEFAULTS = {
-  heroHeadline: "Live & Work Legally",
-  heroSubheadline: "in Spain",
+  heroHeadline: "Your Spain Digital Nomad Visa,",
+  heroSubheadline: "Handled Start to Finish",
   heroBody: "We guide digital nomads and remote workers through Spain's Digital Nomad Visa and Non-Lucrative Visa — handling every document, every step, so you can focus on your dream life.",
   heroBadgeText: "Trusted Spain Visa Consultants",
   heroHighlights: ["Digital Nomad Visa experts", "98% success rate", "End-to-end support"],

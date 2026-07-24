@@ -18,8 +18,8 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const homePage = await getHomePage().catch(() => null);
   return buildMetadata(homePage?.seo, {
-    title: "Digital Nomad In Spain | Spain Visa Consultants",
-    description: "Expert guidance for Spain's Digital Nomad Visa and Non-Lucrative Visa. 98% approval rate, end-to-end support, 500+ approved clients.",
+    title: "Spain Digital Nomad Visa Consultants | Digital Nomad In Spain",
+    description: "Get your Spain Digital Nomad Visa approved with expert help. 98% approval rate, 500+ clients, end-to-end support. Book your free consultation today.",
     path: "/",
   });
 }

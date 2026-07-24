@@ -10,11 +10,11 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans", display
 
 export const metadata: Metadata = {
   title: {
-    default: `${SITE_NAME} | Spain Visa Consultants`,
+    default: `Spain Digital Nomad Visa Consultants | ${SITE_NAME}`,
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Expert guidance for Spain's Digital Nomad Visa and Non-Lucrative Visa. 98% approval rate, end-to-end support, 500+ approved clients.",
+    "Get your Spain Digital Nomad Visa approved with expert help. 98% approval rate, 500+ clients, end-to-end support. Book your free consultation today.",
   keywords: [
     "digital nomad visa spain",
     "spain non-lucrative visa",
@@ -30,13 +30,13 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} | Spain Visa Consultants`,
+    title: `Spain Digital Nomad Visa Consultants | ${SITE_NAME}`,
     description: SITE_TAGLINE,
     images: [{ url: `${SITE_URL}/opengraph-image`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} | Spain Visa Consultants`,
+    title: `Spain Digital Nomad Visa Consultants | ${SITE_NAME}`,
     description: SITE_TAGLINE,
   },
 };
